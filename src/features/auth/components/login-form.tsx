@@ -2,6 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
+import { FaGithub } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 
 import {
   FieldGroup,
@@ -20,10 +22,11 @@ import { loginSchema, type LoginFormData } from "../schemas";
 import Link from "next/link";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import { useLogin } from "../hooks/use-login";
 
 const LoginForm = () => {
+  const { mutate, isPending } = useLogin();
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -32,8 +35,10 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log(data);
+  const onSubmit = async (data: LoginFormData) => {
+    form.reset();
+
+    mutate({ json: data });
   };
 
   return (
@@ -117,21 +122,30 @@ const LoginForm = () => {
           </FieldGroup>
 
           <Field>
-            <Button type="submit">Log In</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Spinner />
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                "Log In"
+              )}
+            </Button>
           </Field>
 
           <FieldSeparator>OR LOGIN WITH</FieldSeparator>
 
           <FieldGroup className="grid grid-cols-2">
             <Field>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 <FcGoogle />
                 Google
               </Button>
             </Field>
 
             <Field>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 <FaGithub />
                 Github
               </Button>

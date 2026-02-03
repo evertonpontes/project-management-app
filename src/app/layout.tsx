@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Public_Sans } from "next/font/google";
+
+import QueryClientProvider from "@/components/query-client-wrapper";
+import { Toaster } from "@/components/ui/sonner";
+
 import "./globals.css";
 
 const publicSans = Public_Sans({
@@ -18,7 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${publicSans.className} antialiased`}>{children}</body>
+      <body className={`${publicSans.className} antialiased`}>
+        <QueryClientProvider>
+          {children}
+          <Toaster />
+        </QueryClientProvider>
+      </body>
     </html>
   );
 }

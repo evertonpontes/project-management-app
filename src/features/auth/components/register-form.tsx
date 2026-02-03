@@ -20,8 +20,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { useRegister } from "../hooks/use-register";
 
 const RegisterForm = () => {
+  const { mutate, isPending } = useRegister();
+
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -33,7 +36,7 @@ const RegisterForm = () => {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    console.log(data);
+    return mutate({ json: data });
   };
 
   return (
@@ -133,21 +136,30 @@ const RegisterForm = () => {
           />
 
           <Field>
-            <Button type="submit">Log In</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Spinner />
+                  <span>Signing Up...</span>
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
           </Field>
 
           <FieldSeparator>OR SIGN UP WITH</FieldSeparator>
 
           <FieldGroup className="grid grid-cols-2">
             <Field>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 <FcGoogle />
                 Google
               </Button>
             </Field>
 
             <Field>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 <FaGithub />
                 Github
               </Button>

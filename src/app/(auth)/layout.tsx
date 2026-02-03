@@ -21,12 +21,11 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
         </Link>
 
         <div className="flex flex-col items-center gap-6 text-center text-wrap">
-          <h1 className="text-4xl text-white tracking-tight">
-            Manage projects and improve your workflow with us.
+          <h1 className="text-5xl text-white tracking-tight leading-13">
+            Most powerful tool of project management for your team.
           </h1>
-          <p className="text-2xl text-white leading-14">
-            We make it easy for you to manage your projects and collaborate with
-            your team.
+          <p className="text-xl text-white leading-9">
+            With Plantask, you can easily plan and track your works.
           </p>
         </div>
 

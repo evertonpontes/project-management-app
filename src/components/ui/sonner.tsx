@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CheckCircleIcon, InfoIcon, WarningIcon, XCircleIcon, SpinnerIcon } from "@phosphor-icons/react"
+import { useTheme } from "next-themes";
+import { Toaster as Sonner, type ToasterProps } from "sonner";
+import {
+  CheckCircleIcon,
+  InfoIcon,
+  WarningIcon,
+  XCircleIcon,
+  SpinnerIcon,
+} from "@phosphor-icons/react";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
@@ -13,19 +19,29 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       icons={{
         success: (
-          <CheckCircleIcon className="size-4" />
+          <div className="size-8 rounded-md bg-teal-500 text-white flex items-center justify-center mr-2">
+            <CheckCircleIcon weight="bold" className="size-4" />
+          </div>
         ),
         info: (
-          <InfoIcon className="size-4" />
+          <div className="size-8 rounded-md bg-blue-500 text-white flex items-center justify-center mr-2">
+            <InfoIcon weight="bold" className="size-4" />
+          </div>
         ),
         warning: (
-          <WarningIcon className="size-4" />
+          <div className="size-8 rounded-md bg-amber-500 text-white flex items-center justify-center mr-2">
+            <WarningIcon weight="bold" className="size-4" />
+          </div>
         ),
         error: (
-          <XCircleIcon className="size-4" />
+          <div className="size-8 rounded-md bg-rose-500 text-white flex items-center justify-center mr-2">
+            <XCircleIcon weight="bold" className="size-4" />
+          </div>
         ),
         loading: (
-          <SpinnerIcon className="size-4 animate-spin" />
+          <div className="size-8 rounded-md bg-indigo-500 text-white flex items-center justify-center mr-2">
+            <SpinnerIcon weight="bold" className="size-4 animate-spin" />
+          </div>
         ),
       }}
       style={
@@ -39,11 +55,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: "cn-toast",
+          content: "ml-4",
+          loader: "mx-2.5",
         },
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };
