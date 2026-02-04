@@ -1,31 +1,26 @@
-"use client";
-
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { UserButton } from "@/components/user-button";
-import { useCurrentPicture } from "@/features/auth/hooks/use-current-picture";
-import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
-import { useLogout } from "@/features/auth/hooks/use-logout";
-import Image from "next/image";
+import { QueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
+import { getUser } from "@/lib/dal";
+import { Header } from "@/components/header";
+import { WorkspaceForm } from "@/features/workspace/components/workspace-form";
 
-const WorkspacePage = () => {
-  const { data: response } = useCurrentUser();
-  const { mutate } = useLogout();
+const WorkspacePage = async () => {
+  const queryClient = new QueryClient();
 
-  if (!response) redirect("/sign-in");
+  const user = await queryClient.fetchQuery({
+    queryKey: ["current"],
+    queryFn: getUser,
+  });
 
-  const pictureUrl =
-    process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT! +
-    `/avatars/initials?name=${response.data.name.split(" ").splice(0, 2).join("+")}&width=100&height=100`;
+  if (!user) redirect("/sign-in");
 
   return (
-    <div>
-      <h1>This page is protected</h1>
-      <p>{response.data.email}</p>
-      <p>{response.data.name}</p>
-      <UserButton />
-    </div>
+    <main className="flex h-full min-h-svh flex-col w-full">
+      <Header />
+      <div className="flex items-center justify-center w-full h-full grow ">
+        <WorkspaceForm />
+      </div>
+    </main>
   );
 };
 

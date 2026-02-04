@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { useTheme } from "next-themes";
+import { SignOutIcon, UserIcon } from "@phosphor-icons/react";
 
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
@@ -14,10 +15,9 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { SignOutIcon, UserIcon } from "@phosphor-icons/react";
-import { useEffect } from "react";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
+import { Skeleton } from "./ui/skeleton";
 
 const UserButton = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -28,11 +28,9 @@ const UserButton = () => {
     process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT! +
     `/avatars/initials?name=${user?.data.name.split(" ").splice(0, 2).join("+")}&width=100&height=100`;
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      redirect("/sign-in");
-    }
-  }, [isLoading, user]);
+  if (isLoading) return <Skeleton className="size-8 rounded-full" />;
+
+  if (!isLoading && !user) redirect("/sign-in");
 
   return (
     <DropdownMenu>
@@ -41,7 +39,12 @@ const UserButton = () => {
           <AvatarImage src={pictureUrl} alt="avatar" />
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="bottom" className="w-56">
+      <DropdownMenuContent
+        align="end"
+        side="bottom"
+        className="w-56"
+        sideOffset={8}
+      >
         <DropdownMenuGroup>
           <Avatar className="mx-auto size-10 mt-2">
             <AvatarImage src={pictureUrl} alt="avatar" />

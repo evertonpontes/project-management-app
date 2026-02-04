@@ -10,39 +10,6 @@ import { authMiddleware } from "@/lib/auth-middleware";
 import { errorApi } from "@/lib/error-api";
 
 const app = new Hono()
-  .get("/current/picture", authMiddleware, async (c) => {
-    const avatars = c.get("avatars");
-
-    const user = c.get("user");
-
-    const userName = user.name.split(" ").slice(0, 2).join(" ");
-
-    const arrayBuffer = await avatars.getInitials({
-      name: userName,
-      width: 100,
-      height: 100,
-    });
-
-    const base64Logo = Buffer.from(arrayBuffer).toString("base64");
-
-    console.log(base64Logo);
-
-    const byteCharacters = atob(base64Logo);
-
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-
-    const blob = new Blob([byteArray], { type: "image/png" });
-
-    const url = URL.createObjectURL(blob);
-
-    return c.json({ success: true, data: url });
-  })
   .get("/current", authMiddleware, async (c) => {
     const user = c.get("user");
 
