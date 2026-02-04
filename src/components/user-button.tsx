@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { useTheme } from "next-themes";
 
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
@@ -13,16 +14,15 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
 import { SignOutIcon, UserIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
-import { Switch } from "./ui/switch";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 
 const UserButton = () => {
   const { data: user, isLoading } = useCurrentUser();
   const { mutate } = useLogout();
+  const { setTheme, theme } = useTheme();
 
   const pictureUrl =
     process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT! +
@@ -75,7 +75,11 @@ const UserButton = () => {
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-sm">Theme</DropdownMenuLabel>
-          <RadioGroup defaultValue="light" className="w-fit ml-4 py-2">
+          <RadioGroup
+            value={theme}
+            onValueChange={setTheme}
+            className="w-fit ml-4 py-2"
+          >
             <div className="flex items-center gap-3 text-muted-foreground">
               <RadioGroupItem value="light" id="r1" />
               <Label htmlFor="r1">Light</Label>
