@@ -4,7 +4,9 @@ import {
   Account,
   Client,
   Models,
+  Avatars,
   type Account as AccountType,
+  type Avatars as AvatarsType,
 } from "node-appwrite";
 import { createMiddleware } from "hono/factory";
 import { cookies } from "next/headers";
@@ -14,6 +16,7 @@ type ResponseType = {
   Variables: {
     account: AccountType;
     user: Models.User<Models.Preferences>;
+    avatars: AvatarsType;
   };
 };
 
@@ -33,10 +36,12 @@ const authMiddleware = createMiddleware<ResponseType>(async (c, next) => {
   client.setSession(session.value);
 
   const account = new Account(client);
+  const avatars = new Avatars(client);
   const user = await account.get();
 
   c.set("account", account);
   c.set("user", user);
+  c.set("avatars", avatars);
 
   return next();
 });

@@ -12,6 +12,10 @@ export default async function proxy(req: NextRequest) {
   const isProtected = protectedRoutes.includes(path);
   const isPublic = publicRoutes.includes(path);
 
+  console.log("path", path);
+  console.log("isProtected", isProtected);
+  console.log("isPublic", isPublic);
+
   const session = (await cookies()).get(COOKIES_SESSION_NAME);
 
   // 3. Redirect to /sign-in if user is not authenticated
@@ -20,7 +24,7 @@ export default async function proxy(req: NextRequest) {
   }
 
   // 4. Redirect to /workspace if user is authenticated
-  if (isPublic && session && req.nextUrl.pathname.startsWith("/workspace")) {
+  if (isPublic && session && !req.nextUrl.pathname.startsWith("/workspace")) {
     return NextResponse.redirect(new URL("/workspace", req.url));
   }
 
@@ -28,5 +32,7 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|.*\\.svg$|favicon.ico|.*\\.json$).*)",
+  ],
 };

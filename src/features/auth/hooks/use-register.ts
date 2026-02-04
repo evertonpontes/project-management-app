@@ -29,10 +29,10 @@ const useRegister = () => {
       return response.json();
     },
     onSuccess: async () => {
+      router.refresh();
       await queryClient.invalidateQueries({ queryKey: ["current"] });
 
       toast.success("Account created successfully");
-      router.replace("/workspace");
     },
     onError: (error) => {
       toast.error(error.message);

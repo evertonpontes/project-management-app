@@ -23,10 +23,10 @@ const useLogout = () => {
       return response.json();
     },
     onSuccess: async () => {
+      router.refresh();
       await queryClient.invalidateQueries({ queryKey: ["current"] });
 
-      toast.success("Login successful");
-      router.replace("/sign-in");
+      toast.success("Logout successful");
     },
     onError: (error) => {
       toast.error(error.message);
