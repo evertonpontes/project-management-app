@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ID } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 
 import { createWorkspaceSchema } from "../schemas";
 import { authMiddleware } from "@/lib/auth-middleware";
@@ -9,16 +9,31 @@ import {
   DATABASE_ID,
   PROJECT_ID,
   STORAGE_ID,
+  USER_ROLES_WORKSPACE,
 } from "../constants";
 
 const app = new Hono()
   .get("/", authMiddleware, async (c) => {
     const tables = c.get("tables");
+    const user = c.get("user");
+
+    const workspaceMember = await tables.listRows({
+      databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      tableId: "workspace-member",
+      queries: [Query.equal("memberId", [user.$id])],
+    });
+
+    if (workspaceMember.total === 0) return c.json({ success: true, data: [] });
+
+    const workspacesId: string[] = workspaceMember.rows.map(
+      (workspace) => workspace.workspaceId,
+    );
 
     const workspaces = await tables.listRows({
       databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
       tableId: "workspaces",
       total: true,
+      queries: [Query.equal("$id", workspacesId)],
     });
 
     return c.json({ success: true, data: workspaces });
@@ -52,7 +67,7 @@ const app = new Hono()
           PROJECT_ID;
       }
 
-      await tables.createRow({
+      const workspace = await tables.createRow({
         databaseId: DATABASE_ID,
         tableId: "workspaces",
         rowId: ID.unique(),
@@ -60,6 +75,19 @@ const app = new Hono()
           name,
           userId: user.$id,
           imageUrl: imageUploadedUrl,
+        },
+      });
+
+      await tables.createRow({
+        databaseId: DATABASE_ID,
+        tableId: "workspace-member",
+        rowId: ID.unique(),
+        data: {
+          memberId: user.$id,
+          workspaceId: workspace.$id,
+          joinDate: new Date().toISOString(),
+          role: "owner",
+          permissions: JSON.stringify(USER_ROLES_WORKSPACE.owner),
         },
       });
 

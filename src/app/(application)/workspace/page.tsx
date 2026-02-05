@@ -17,7 +17,7 @@ const WorkspacesPage = async () => {
     queryFn: getUser,
   });
 
-  const workspaces = await queryClient.fetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: ["workspaces"],
     queryFn: getAllWorkspaces,
   });

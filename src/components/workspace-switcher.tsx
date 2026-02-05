@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { CaretDownIcon, PlusIcon, PlusSquareIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, PlusIcon } from "@phosphor-icons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -26,13 +26,11 @@ const WorkspaceSwitcher = () => {
   const pathname = usePathname();
   const workspaceId = pathname.split("/")[2];
 
-  const { data, isLoading: isLoadingWorkspaces } = useListWorkspaces();
+  const { data: workspaces, isLoading: isLoadingWorkspaces } =
+    useListWorkspaces();
   const { data: workspace, isLoading: isLoadingWorkspace } = useGetWorkspace({
     workspaceId,
   });
-
-  const [workspaces] = React.useState(data?.data.rows);
-  const [value] = React.useState(workspace?.data);
 
   if (isLoadingWorkspaces || isLoadingWorkspace) {
     return <Skeleton className="h-10 w-50" />;
@@ -42,15 +40,20 @@ const WorkspaceSwitcher = () => {
     <Popover>
       <PopoverTrigger render={<div />} nativeButton={false}>
         <Button variant="ghost" size="sm" className="w-50 justify-between">
-          {value && value.name ? (
+          {workspace && workspace.data.name ? (
             <div className="flex items-center gap-2">
               <Avatar className="rounded-md size-7">
-                <AvatarImage src={value.imageUrl} className="rounded-md" />
+                <AvatarImage
+                  src={workspace.data.imageUrl}
+                  className="rounded-md"
+                />
                 <AvatarFallback className="bg-teal-500 text-white rounded-md text-xs">
-                  {value.name ? value.name.charAt(0).toUpperCase() : "W"}
+                  {workspace.data.name
+                    ? workspace.data.name.charAt(0).toUpperCase()
+                    : "W"}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">{value?.name}</span>
+              <span className="text-sm font-medium">{workspace.data.name}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
@@ -64,31 +67,39 @@ const WorkspaceSwitcher = () => {
         <Command defaultValue="-" disablePointerSelection={true}>
           <CommandInput placeholder="Search workspaces..." />
           <CommandList>
-            <CommandEmpty>No workspaces found.</CommandEmpty>
+            <CommandEmpty>No command found.</CommandEmpty>
             <CommandGroup heading="Workspaces">
-              {workspaces?.map((workspace) => (
-                <CommandItem
-                  key={workspace.$id}
-                  value={workspace.name}
-                  onSelect={() => router.push(`/workspace/${workspace.$id}`)}
-                >
-                  <div className="relative size-8 overflow-hidden rounded-md">
-                    <span className="text-sm font-semibold text-white bg-teal-500 w-full h-full text-center flex items-center justify-center">
-                      {workspace.name.charAt(0).toUpperCase()}
+              {workspaces?.data.total && workspaces?.data.total > 0 ? (
+                workspaces?.data.rows.map((workspace) => (
+                  <CommandItem
+                    key={workspace.$id}
+                    value={workspace.name}
+                    onSelect={() => router.push(`/workspace/${workspace.$id}`)}
+                  >
+                    <div className="relative size-8 overflow-hidden rounded-md">
+                      <span className="text-sm font-semibold text-white bg-teal-500 w-full h-full text-center flex items-center justify-center">
+                        {workspace.name.charAt(0).toUpperCase()}
+                      </span>
+                      {workspace.imageUrl && (
+                        <Image
+                          src={workspace.imageUrl}
+                          alt="workspace logo"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 100vw) 32px"
+                        />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium">
+                      {workspace.name}
                     </span>
-                    {workspace.imageUrl && (
-                      <Image
-                        src={workspace.imageUrl}
-                        alt="workspace logo"
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 100vw) 32px"
-                      />
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{workspace.name}</span>
-                </CommandItem>
-              ))}
+                  </CommandItem>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No workspaces found.
+                </p>
+              )}
             </CommandGroup>
             <CommandSeparator className="my-2" />
             <CommandGroup heading="Actions">

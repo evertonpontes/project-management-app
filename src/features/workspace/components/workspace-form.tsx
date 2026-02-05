@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/card";
 import { ImageIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 
 const WorkspaceForm = () => {
   const { mutate, isPending } = useCreateWorkspace();
@@ -46,6 +45,8 @@ const WorkspaceForm = () => {
     if (file) {
       form.setValue("file", file);
     }
+
+    event.target.value = "";
   };
 
   const onSubmit = (data: CreateWorkspaceFormData) => {
