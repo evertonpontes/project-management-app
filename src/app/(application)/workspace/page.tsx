@@ -1,10 +1,15 @@
-import { QueryClient } from "@tanstack/react-query";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { Header } from "@/components/header";
 import { WorkspaceForm } from "@/features/workspace/components/workspace-form";
+import { getAllWorkspaces } from "@/features/workspace/actions/get-all-workspaces";
 
-const WorkspacePage = async () => {
+const WorkspacesPage = async () => {
   const queryClient = new QueryClient();
 
   const user = await queryClient.fetchQuery({
@@ -12,16 +17,23 @@ const WorkspacePage = async () => {
     queryFn: getUser,
   });
 
+  const workspaces = await queryClient.fetchQuery({
+    queryKey: ["workspaces"],
+    queryFn: getAllWorkspaces,
+  });
+
   if (!user) redirect("/sign-in");
 
   return (
-    <main className="flex h-full min-h-svh flex-col w-full">
-      <Header />
-      <div className="flex items-center justify-center w-full h-full grow ">
-        <WorkspaceForm />
-      </div>
-    </main>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <main className="flex h-full min-h-svh flex-col w-full">
+        <Header />
+        <div className="flex items-center justify-center w-full h-full grow ">
+          <WorkspaceForm />
+        </div>
+      </main>
+    </HydrationBoundary>
   );
 };
 
-export default WorkspacePage;
+export default WorkspacesPage;

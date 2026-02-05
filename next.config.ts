@@ -5,9 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
         hostname: "nyc.cloud.appwrite.io",
-        pathname: "/v1/avatars/**",
       },
     ],
   },

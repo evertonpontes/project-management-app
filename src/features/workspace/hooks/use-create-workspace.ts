@@ -26,7 +26,7 @@ const useCreateWorkspace = () => {
     },
     onSuccess: async () => {
       router.refresh();
-      await queryClient.invalidateQueries({ queryKey: ["current"] });
+      await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
 
       toast.success("Account created successfully");
     },
