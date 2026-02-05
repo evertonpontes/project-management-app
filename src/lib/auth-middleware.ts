@@ -4,7 +4,11 @@ import {
   Account,
   Client,
   Models,
+  TablesDB,
+  Storage,
   type Account as AccountType,
+  type TablesDB as TablesDBType,
+  type Storage as StorageType,
 } from "node-appwrite";
 import { createMiddleware } from "hono/factory";
 import { cookies } from "next/headers";
@@ -14,6 +18,8 @@ type ResponseType = {
   Variables: {
     account: AccountType;
     user: Models.User<Models.Preferences>;
+    tables: TablesDBType;
+    storage: StorageType;
   };
 };
 
@@ -33,9 +39,13 @@ const authMiddleware = createMiddleware<ResponseType>(async (c, next) => {
   client.setSession(session.value);
 
   const account = new Account(client);
+  const tables = new TablesDB(client);
+  const storage = new Storage(client);
   const user = await account.get();
 
   c.set("account", account);
+  c.set("tables", tables);
+  c.set("storage", storage);
   c.set("user", user);
 
   return next();

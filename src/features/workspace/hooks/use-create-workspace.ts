@@ -16,8 +16,8 @@ const useCreateWorkspace = () => {
   const router = useRouter();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.workspace.$post({ json });
+    mutationFn: async ({ form }) => {
+      const response = await client.api.workspace.$post({ form });
 
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);

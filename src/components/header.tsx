@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { Separator } from "./ui/separator";
 import { UserButton } from "./user-button";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { Button } from "./ui/button";
-import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 
 const Header = () => {
   return (

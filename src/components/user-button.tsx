@@ -1,3 +1,5 @@
+"use client";
+
 import { redirect } from "next/navigation";
 import { useTheme } from "next-themes";
 import { SignOutIcon, UserIcon } from "@phosphor-icons/react";

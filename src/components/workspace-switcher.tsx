@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import { CaretDownIcon, PlusIcon, PlusSquareIcon } from "@phosphor-icons/react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
@@ -21,6 +23,16 @@ const workspaces = [
 ];
 
 const WorkspaceSwitcher = () => {
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <Popover>
       <PopoverTrigger render={<div />} nativeButton={false}>

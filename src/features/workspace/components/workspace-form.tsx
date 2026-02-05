@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 
@@ -25,9 +26,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ImageIcon, UploadSimpleIcon } from "@phosphor-icons/react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const WorkspaceForm = () => {
   const { mutate, isPending } = useCreateWorkspace();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<CreateWorkspaceFormData>({
     resolver: zodResolver(createWorkspaceSchema),
@@ -36,8 +41,17 @@ const WorkspaceForm = () => {
     },
   });
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      form.setValue("file", file);
+    }
+  };
+
   const onSubmit = (data: CreateWorkspaceFormData) => {
-    return mutate({ json: data });
+    form.reset();
+
+    return mutate({ form: data });
   };
 
   return (
@@ -55,6 +69,57 @@ const WorkspaceForm = () => {
             className="w-full flex justify-center"
           >
             <FieldGroup className="w-full max-w-md">
+              <Controller
+                name="file"
+                control={form.control}
+                render={({ field, fieldState: { invalid, error } }) => (
+                  <Field>
+                    <FieldLabel htmlFor="logo">Workspace Logo</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <div className="size-16 rounded-sm border border-border border-dashed bg-muted flex items-center justify-center relative text-muted-foreground/50 overflow-hidden">
+                        <ImageIcon className="size-6" />
+                        {field.value && (
+                          <Image
+                            src={
+                              field.value instanceof File
+                                ? URL.createObjectURL(field.value)
+                                : field.value
+                            }
+                            alt="logo"
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          size="xs"
+                          variant="secondary"
+                          onClick={() => inputRef.current?.click()}
+                        >
+                          <UploadSimpleIcon
+                            weight="bold"
+                            className="size-4 mr-0.5"
+                          />
+                          Upload
+                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                          PNG, JPG, JPEG or SVG (max. 5MB)
+                        </p>
+                      </div>
+                      <input
+                        id="logo"
+                        ref={inputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                    </div>
+                    {invalid && <FieldError>{error?.message}</FieldError>}
+                  </Field>
+                )}
+              />
+
               <Controller
                 name="name"
                 control={form.control}

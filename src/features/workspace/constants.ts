@@ -1,0 +1,4 @@
+export const API_ENDPOINT = process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT!;
+export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
+export const STORAGE_ID = process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID!;
+export const PROJECT_ID = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!;

@@ -1,19 +1,55 @@
 import { Hono } from "hono";
-import { setCookie, deleteCookie } from "hono/cookie";
 import { zValidator } from "@hono/zod-validator";
 import { ID } from "node-appwrite";
 
 import { createWorkspaceSchema } from "../schemas";
-import { createAdminClient } from "@/lib/appwrite";
 import { authMiddleware } from "@/lib/auth-middleware";
-import { errorApi } from "@/lib/error-api";
+import {
+  API_ENDPOINT,
+  DATABASE_ID,
+  PROJECT_ID,
+  STORAGE_ID,
+} from "../constants";
 
 const app = new Hono().post(
   "/",
-  zValidator("json", createWorkspaceSchema),
+  zValidator("form", createWorkspaceSchema),
   authMiddleware,
   async (c) => {
-    const { name } = c.req.valid("json");
+    const { name, file } = c.req.valid("form");
+    const tables = c.get("tables");
+    const storage = c.get("storage");
+    const user = c.get("user");
+
+    let imageUploadedUrl: string | undefined;
+
+    if (file && file instanceof File) {
+      const fileUploaded = await storage.createFile({
+        bucketId: STORAGE_ID,
+        fileId: ID.unique(),
+        file: file,
+      });
+
+      imageUploadedUrl =
+        API_ENDPOINT +
+        "/storage/buckets/" +
+        STORAGE_ID +
+        "/files/" +
+        fileUploaded.$id +
+        "/view?project=" +
+        PROJECT_ID;
+    }
+
+    await tables.createRow({
+      databaseId: DATABASE_ID,
+      tableId: "workspaces",
+      rowId: ID.unique(),
+      data: {
+        name,
+        userId: user.$id,
+        imageUrl: imageUploadedUrl,
+      },
+    });
 
     return c.json(
       { success: true, message: "Workspace created successfully" },

@@ -12,10 +12,6 @@ export default async function proxy(req: NextRequest) {
   const isProtected = protectedRoutes.includes(path);
   const isPublic = publicRoutes.includes(path);
 
-  console.log("path", path);
-  console.log("isProtected", isProtected);
-  console.log("isPublic", isPublic);
-
   const session = (await cookies()).get(COOKIES_SESSION_NAME);
 
   // 3. Redirect to /sign-in if user is not authenticated
