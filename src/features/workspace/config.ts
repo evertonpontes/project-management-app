@@ -1,7 +1,12 @@
 export const API_ENDPOINT = process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT!;
-export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 export const STORAGE_ID = process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID!;
 export const PROJECT_ID = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!;
+
+export enum USER_ROLES {
+  owner = "owner",
+  admin = "admin",
+  member = "member",
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const USER_ROLES_WORKSPACE: Record<string, { [key: string]: any }> = {

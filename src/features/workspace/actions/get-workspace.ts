@@ -1,8 +1,9 @@
 "use server";
 
+import { Client, TablesDB } from "node-appwrite";
+
 import { COOKIES_SESSION_NAME } from "@/features/auth/constants";
 import { cookies } from "next/headers";
-import { Client, TablesDB } from "node-appwrite";
 
 const getWorkspace = async ({ workspaceId }: { workspaceId: string }) => {
   try {

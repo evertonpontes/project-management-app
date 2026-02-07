@@ -24,31 +24,35 @@ type ResponseType = {
 };
 
 const authMiddleware = createMiddleware<ResponseType>(async (c, next) => {
-  const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+  try {
+    const client = new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT!)
+      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
 
-  const cookieStores = cookies();
+    const cookieStores = cookies();
 
-  const session = (await cookieStores).get(COOKIES_SESSION_NAME);
+    const session = (await cookieStores).get(COOKIES_SESSION_NAME);
 
-  if (!session || !session.value) {
-    return c.json({ error: "Unauthorized" }, 401);
+    if (!session || !session.value) {
+      return c.json({ message: "Unauthorized" }, 401);
+    }
+
+    client.setSession(session.value);
+
+    const account = new Account(client);
+    const tables = new TablesDB(client);
+    const storage = new Storage(client);
+    const user = await account.get();
+
+    c.set("account", account);
+    c.set("tables", tables);
+    c.set("storage", storage);
+    c.set("user", user);
+
+    return next();
+  } catch {
+    return c.json({ message: "Unauthorized" }, 401);
   }
-
-  client.setSession(session.value);
-
-  const account = new Account(client);
-  const tables = new TablesDB(client);
-  const storage = new Storage(client);
-  const user = await account.get();
-
-  c.set("account", account);
-  c.set("tables", tables);
-  c.set("storage", storage);
-  c.set("user", user);
-
-  return next();
 });
 
 export { authMiddleware };

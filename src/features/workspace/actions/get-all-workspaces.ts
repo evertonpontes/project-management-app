@@ -1,8 +1,9 @@
 "use server";
 
-import { COOKIES_SESSION_NAME } from "@/features/auth/constants";
 import { cookies } from "next/headers";
 import { Account, Client, Query, TablesDB } from "node-appwrite";
+
+import { COOKIES_SESSION_NAME } from "@/features/auth/constants";
 
 const getAllWorkspaces = async () => {
   const client = new Client()
@@ -30,6 +31,8 @@ const getAllWorkspaces = async () => {
     tableId: "workspace-member",
     queries: [Query.equal("memberId", [user.$id])],
   });
+
+  if (workspaceMember.total === 0) return { data: { total: 0, rows: [] } };
 
   const workspacesId: string[] = workspaceMember.rows.map(
     (workspace) => workspace.workspaceId,

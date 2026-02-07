@@ -6,29 +6,34 @@ import { createWorkspaceSchema } from "../schemas";
 import { authMiddleware } from "@/lib/auth-middleware";
 import {
   API_ENDPOINT,
-  DATABASE_ID,
   PROJECT_ID,
   STORAGE_ID,
+  USER_ROLES,
   USER_ROLES_WORKSPACE,
-} from "../constants";
+} from "../config";
 
 const app = new Hono()
   .get("/", authMiddleware, async (c) => {
     const tables = c.get("tables");
     const user = c.get("user");
 
+    // Return all workspaces where user is member
     const workspaceMember = await tables.listRows({
       databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
       tableId: "workspace-member",
       queries: [Query.equal("memberId", [user.$id])],
     });
 
-    if (workspaceMember.total === 0) return c.json({ success: true, data: [] });
+    // If user is not member of any workspace return empty array
+    if (workspaceMember.total === 0)
+      return c.json({ data: { total: 0, rows: [] } });
 
+    // Map the id of each workspace
     const workspacesId: string[] = workspaceMember.rows.map(
       (workspace) => workspace.workspaceId,
     );
 
+    // Query all workspaces where id is in workspacesId
     const workspaces = await tables.listRows({
       databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
       tableId: "workspaces",
@@ -36,7 +41,7 @@ const app = new Hono()
       queries: [Query.equal("$id", workspacesId)],
     });
 
-    return c.json({ success: true, data: workspaces });
+    return c.json({ data: workspaces });
   })
   .post(
     "/",
@@ -65,10 +70,12 @@ const app = new Hono()
           fileUploaded.$id +
           "/view?project=" +
           PROJECT_ID;
+      } else {
+        imageUploadedUrl = file;
       }
 
       const workspace = await tables.createRow({
-        databaseId: DATABASE_ID,
+        databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
         tableId: "workspaces",
         rowId: ID.unique(),
         data: {
@@ -79,26 +86,23 @@ const app = new Hono()
       });
 
       await tables.createRow({
-        databaseId: DATABASE_ID,
+        databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
         tableId: "workspace-member",
         rowId: ID.unique(),
         data: {
           memberId: user.$id,
           workspaceId: workspace.$id,
           joinDate: new Date().toISOString(),
-          role: "owner",
+          role: USER_ROLES.owner,
           permissions: JSON.stringify(USER_ROLES_WORKSPACE.owner),
         },
       });
 
-      return c.json(
-        { success: true, message: "Workspace created successfully" },
-        201,
-      );
+      return c.json({ message: "Workspace created successfully" }, 201);
     },
   )
-  .get("/:id", authMiddleware, async (c) => {
-    const workspaceId = c.req.param("id");
+  .get("/:workspaceId", authMiddleware, async (c) => {
+    const workspaceId = c.req.param("workspaceId");
     const tables = c.get("tables");
 
     const workspace = await tables.getRow({
@@ -107,7 +111,7 @@ const app = new Hono()
       rowId: workspaceId,
     });
 
-    return c.json({ success: true, data: workspace });
+    return c.json({ data: workspace });
   });
 
 export default app;

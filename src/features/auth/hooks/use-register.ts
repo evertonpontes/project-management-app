@@ -23,8 +23,10 @@ const useRegister = () => {
     mutationFn: async ({ json }) => {
       const response = await client.api.auth["sign-up"]["$post"]({ json });
 
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message);
+      }
 
       return response.json();
     },

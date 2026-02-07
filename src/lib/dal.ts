@@ -23,16 +23,12 @@ export const getUser = async () => {
 
     const session = await verifySession();
 
-    if (!session) {
-      return null;
-    }
-
     client.setSession(session);
 
     const account = new Account(client);
     const user = await account.get();
 
-    return { success: true, data: JSON.parse(JSON.stringify(user)) };
+    return { data: JSON.parse(JSON.stringify(user)) };
   } catch {
     return null;
   }

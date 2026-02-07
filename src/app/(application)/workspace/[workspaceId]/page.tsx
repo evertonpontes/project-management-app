@@ -24,7 +24,7 @@ const SelectedWorkspacePage = async ({
   });
 
   const workspace = await queryClient.fetchQuery({
-    queryKey: ["workspaces", workspaceId],
+    queryKey: ["workspace", workspaceId],
     queryFn: async () => await getWorkspace({ workspaceId }),
   });
 

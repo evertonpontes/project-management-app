@@ -38,30 +38,36 @@ const WorkspaceSwitcher = () => {
 
   return (
     <Popover>
-      <PopoverTrigger render={<div />} nativeButton={false}>
-        <Button variant="ghost" size="sm" className="w-50 justify-between">
-          {workspace && workspace.data.name ? (
-            <div className="flex items-center gap-2">
-              <Avatar className="rounded-md size-7">
-                <AvatarImage
-                  src={workspace.data.imageUrl}
-                  className="rounded-md"
-                />
-                <AvatarFallback className="bg-teal-500 text-white rounded-md text-xs">
-                  {workspace.data.name
-                    ? workspace.data.name.charAt(0).toUpperCase()
-                    : "W"}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm font-medium">{workspace.data.name}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Workspace Overview</span>
-            </div>
-          )}
-          <CaretDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="min-w-50 justify-between"
+          />
+        }
+      >
+        {workspace && workspace.data.name ? (
+          <div className="flex items-center gap-2">
+            <Avatar className="rounded-md size-7">
+              <AvatarImage
+                src={workspace.data.imageUrl}
+                className="rounded-md"
+              />
+              <AvatarFallback className="bg-teal-500 text-white rounded-md text-xs">
+                {workspace.data.name
+                  ? workspace.data.name.charAt(0).toUpperCase()
+                  : "W"}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium">{workspace.data.name}</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Workspace Overview</span>
+          </div>
+        )}
+        <CaretDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
       <PopoverContent align="start" sideOffset={8} className="p-0">
         <Command defaultValue="-" disablePointerSelection={true}>
@@ -69,8 +75,10 @@ const WorkspaceSwitcher = () => {
           <CommandList>
             <CommandEmpty>No command found.</CommandEmpty>
             <CommandGroup heading="Workspaces">
-              {workspaces?.data.total && workspaces?.data.total > 0 ? (
-                workspaces?.data.rows.map((workspace) => (
+              {workspaces?.data &&
+              "rows" in workspaces.data &&
+              workspaces.data.rows.length > 0 ? (
+                workspaces.data.rows.map((workspace) => (
                   <CommandItem
                     key={workspace.$id}
                     value={workspace.name}

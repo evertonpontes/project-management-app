@@ -18,7 +18,7 @@ const useLogout = () => {
       const response = await client.api.auth["sign-out"]["$post"]();
 
       if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error("Something went wrong while logging out");
 
       return response.json();
     },

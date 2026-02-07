@@ -11,7 +11,9 @@ const useListWorkspaces = () => {
       const response = await client.api.workspace.$get();
 
       if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          `${response.status} Something went wrong while getting workspaces`,
+        );
 
       return response.json();
     },

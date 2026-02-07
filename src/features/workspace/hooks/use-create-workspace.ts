@@ -20,7 +20,9 @@ const useCreateWorkspace = () => {
       const response = await client.api.workspace.$post({ form });
 
       if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          `${response.status} Something went wrong while creating workspace`,
+        );
 
       return response.json();
     },

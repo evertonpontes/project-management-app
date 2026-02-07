@@ -36,6 +36,8 @@ const RegisterForm = () => {
   });
 
   const onSubmit = (data: RegisterFormData) => {
+    form.reset();
+
     return mutate({ json: data });
   };
 

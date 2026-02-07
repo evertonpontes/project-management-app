@@ -95,7 +95,7 @@ const WorkspaceForm = () => {
                       <div className="flex flex-col gap-2">
                         <Button
                           size="xs"
-                          variant="secondary"
+                          variant="outline"
                           onClick={() => inputRef.current?.click()}
                         >
                           <UploadSimpleIcon
