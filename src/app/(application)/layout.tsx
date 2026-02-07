@@ -1,9 +1,12 @@
-import { getUser } from "@/lib/dal";
 import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+
+import { getUser } from "@/lib/dal";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode;
@@ -19,7 +22,10 @@ const WorkspaceLayout = async ({ children }: WorkspaceLayoutProps) => {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      {children}
+      <SidebarProvider>
+        <AppSidebar />
+        {children}
+      </SidebarProvider>
     </HydrationBoundary>
   );
 };

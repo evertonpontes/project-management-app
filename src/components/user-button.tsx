@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { useTheme } from "next-themes";
-import { SignOutIcon, UserIcon } from "@phosphor-icons/react";
+import { CaretUpDownIcon, SignOutIcon, UserIcon } from "@phosphor-icons/react";
 
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
@@ -20,6 +20,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { Skeleton } from "./ui/skeleton";
+import { SidebarMenuButton } from "./ui/sidebar";
 
 const UserButton = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -35,30 +36,38 @@ const UserButton = () => {
   if (!isLoading && !user) redirect("/sign-in");
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        render={<SidebarMenuButton className="h-full w-full" />}
+      >
         <Avatar>
           <AvatarImage src={pictureUrl} alt="avatar" />
         </Avatar>
+        <div className="flex flex-col gap-0.5 w-full">
+          <p className="text-sm font-semibold text-foreground tracking-tight leading-tight">
+            {user?.data.name}
+          </p>
+          <p className="text-xs text-foreground">{user?.data.email}</p>
+        </div>
+        <CaretUpDownIcon className="text-muted-foreground ml-auto shrink-0" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        side="bottom"
-        className="w-56"
-        sideOffset={8}
-      >
+      <DropdownMenuContent className="">
         <DropdownMenuGroup>
-          <Avatar className="mx-auto size-10 mt-2">
-            <AvatarImage src={pictureUrl} alt="avatar" />
-          </Avatar>
-          <div className="flex flex-col items-center justify-center py-2">
-            <p className="text-sm font-semibold text-muted-foreground tracking-tight leading-tight">
-              {user?.data.name}
-            </p>
-            <p className="text-xs text-muted-foreground">{user?.data.email}</p>
+          <div className="flex items-center gap-2 w-full p-2">
+            <Avatar>
+              <AvatarImage src={pictureUrl} alt="avatar" />
+            </Avatar>
+            <div className="flex flex-col gap-0.5 w-full">
+              <p className="text-sm font-semibold text-muted-foreground tracking-tight leading-tight">
+                {user?.data.name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {user?.data.email}
+              </p>
+            </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-sm text-muted-foreground">
+          <DropdownMenuItem className="text-sm text-foreground">
             Account
             <DropdownMenuShortcut>
               <UserIcon />
@@ -67,7 +76,7 @@ const UserButton = () => {
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuItem
-            className="text-sm text-muted-foreground"
+            className="text-sm text-foreground"
             onClick={() => {
               mutate();
             }}
@@ -79,21 +88,23 @@ const UserButton = () => {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-sm">Theme</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-sm text-foreground">
+            Theme
+          </DropdownMenuLabel>
           <RadioGroup
             value={theme}
             onValueChange={setTheme}
             className="w-fit ml-4 py-2"
           >
-            <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="flex items-center gap-3 text-foreground">
               <RadioGroupItem value="light" id="r1" />
               <Label htmlFor="r1">Light</Label>
             </div>
-            <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="flex items-center gap-3 text-foreground">
               <RadioGroupItem value="dark" id="r2" />
               <Label htmlFor="r2">Dark</Label>
             </div>
-            <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="flex items-center gap-3 text-foreground">
               <RadioGroupItem value="system" id="r3" />
               <Label htmlFor="r3">System</Label>
             </div>

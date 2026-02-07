@@ -35,7 +35,6 @@ const SelectedWorkspacePage = async ({
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <main className="flex h-full min-h-svh flex-col w-full">
-        <Header />
         <div className="flex items-center justify-center w-full h-full grow ">
           Workspace
         </div>

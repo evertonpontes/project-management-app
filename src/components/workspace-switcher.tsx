@@ -1,15 +1,11 @@
 "use client";
 
-import React from "react";
-
-import { CaretDownIcon, PlusIcon } from "@phosphor-icons/react";
+import { CaretUpDownIcon, PlusIcon } from "@phosphor-icons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   Command,
   CommandGroup,
-  CommandInput,
   CommandList,
   CommandEmpty,
   CommandSeparator,
@@ -33,20 +29,12 @@ const WorkspaceSwitcher = () => {
   });
 
   if (isLoadingWorkspaces || isLoadingWorkspace) {
-    return <Skeleton className="h-10 w-50" />;
+    return <Skeleton className="h-10 w-full" />;
   }
 
   return (
     <Popover>
-      <PopoverTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="sm"
-            className="min-w-50 justify-between"
-          />
-        }
-      >
+      <PopoverTrigger className="flex items-center justify-between p-2 w-full hover:bg-muted rounded-sm">
         {workspace && workspace.data.name ? (
           <div className="flex items-center gap-2">
             <Avatar className="rounded-md size-7">
@@ -67,11 +55,10 @@ const WorkspaceSwitcher = () => {
             <span className="text-sm font-medium">Workspace Overview</span>
           </div>
         )}
-        <CaretDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <CaretUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
-      <PopoverContent align="start" sideOffset={8} className="p-0">
+      <PopoverContent align="start" side="bottom" className="p-0 w-60">
         <Command defaultValue="-" disablePointerSelection={true}>
-          <CommandInput placeholder="Search workspaces..." />
           <CommandList>
             <CommandEmpty>No command found.</CommandEmpty>
             <CommandGroup heading="Workspaces">
@@ -98,7 +85,7 @@ const WorkspaceSwitcher = () => {
                         />
                       )}
                     </div>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium truncate">
                       {workspace.name}
                     </span>
                   </CommandItem>
@@ -110,7 +97,7 @@ const WorkspaceSwitcher = () => {
               )}
             </CommandGroup>
             <CommandSeparator className="my-2" />
-            <CommandGroup heading="Actions">
+            <CommandGroup>
               <CommandItem>
                 <PlusIcon className="mr-2 h-4 w-4" />
                 <span>New Workspace</span>

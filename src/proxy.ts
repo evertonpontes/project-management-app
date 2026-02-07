@@ -20,7 +20,12 @@ export default async function proxy(req: NextRequest) {
   }
 
   // 4. Redirect to /workspace if user is authenticated
-  if (isPublic && session && !req.nextUrl.pathname.startsWith("/workspace")) {
+  if (
+    isPublic &&
+    session &&
+    !req.nextUrl.pathname.startsWith("/workspace") &&
+    path !== "/"
+  ) {
     return NextResponse.redirect(new URL("/workspace", req.url));
   }
 
