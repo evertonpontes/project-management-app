@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Header } from "@/components/header";
 import { getWorkspace } from "@/features/workspace/actions/get-workspace";
 import { getUser } from "@/lib/dal";
 import {
@@ -34,11 +33,11 @@ const SelectedWorkspacePage = async ({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <main className="flex h-full min-h-svh flex-col w-full">
-        <div className="flex items-center justify-center w-full h-full grow ">
+      <div className="flex h-full flex-col w-full">
+        <div className="flex items-center justify-center w-full h-full grow">
           Workspace
         </div>
-      </main>
+      </div>
     </HydrationBoundary>
   );
 };

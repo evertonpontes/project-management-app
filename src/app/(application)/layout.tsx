@@ -7,6 +7,7 @@ import {
 import { getUser } from "@/lib/dal";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { Header } from "@/components/header";
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode;
@@ -24,7 +25,10 @@ const WorkspaceLayout = async ({ children }: WorkspaceLayoutProps) => {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <SidebarProvider>
         <AppSidebar />
-        {children}
+        <main className="w-full min-h-svh flex flex-col">
+          <Header />
+          {children}
+        </main>
       </SidebarProvider>
     </HydrationBoundary>
   );
