@@ -7,13 +7,11 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 
-interface SelectedWorkspacePageProps {
+interface WorkspacePageProps {
   params: Promise<{ workspaceId: string }>;
 }
 
-const SelectedWorkspacePage = async ({
-  params,
-}: SelectedWorkspacePageProps) => {
+const WorkspacePage = async ({ params }: WorkspacePageProps) => {
   const { workspaceId } = await params;
   const queryClient = new QueryClient();
 
@@ -24,12 +22,12 @@ const SelectedWorkspacePage = async ({
 
   const workspace = await queryClient.fetchQuery({
     queryKey: ["workspace", workspaceId],
-    queryFn: async () => await getWorkspace({ workspaceId }),
+    queryFn: () => getWorkspace({ workspaceId }),
   });
 
-  if (!workspace) redirect("/workspace");
-
   if (!user) redirect("/sign-in");
+
+  if (!workspace) redirect("/workspace");
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -42,4 +40,4 @@ const SelectedWorkspacePage = async ({
   );
 };
 
-export default SelectedWorkspacePage;
+export default WorkspacePage;

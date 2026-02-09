@@ -29,7 +29,7 @@ import {
 import { ImageIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 
-const WorkspaceForm = () => {
+const CreateWorkspaceForm = () => {
   const { mutate, isPending } = useCreateWorkspace();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -138,7 +138,10 @@ const WorkspaceForm = () => {
                 )}
               />
 
-              <Field>
+              <Field orientation="horizontal" className="justify-end">
+                <Button type="button" variant="secondary" disabled={isPending}>
+                  Cancel
+                </Button>
                 <Button type="submit" disabled={isPending}>
                   {isPending ? (
                     <>
@@ -158,4 +161,4 @@ const WorkspaceForm = () => {
   );
 };
 
-export { WorkspaceForm };
+export { CreateWorkspaceForm };

@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "./ui/sidebar";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface NavMainContentProps {
@@ -19,6 +19,7 @@ interface NavMainContentProps {
 
 const NavMainContent = ({ options }: NavMainContentProps) => {
   const params = useParams<{ workspaceId: string }>();
+  const pathname = usePathname();
 
   return (
     <SidebarGroup>
@@ -28,7 +29,7 @@ const NavMainContent = ({ options }: NavMainContentProps) => {
           {options.map((option) => {
             const fullPath = `/workspace/${params.workspaceId}${option.href}`;
             const Icon = option.icon;
-            const isActive = fullPath === window.location.pathname;
+            const isActive = fullPath === pathname;
 
             return (
               <SidebarMenuItem key={option.href}>

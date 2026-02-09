@@ -1,6 +1,5 @@
 "use client";
 
-import { redirect } from "next/navigation";
 import { useTheme } from "next-themes";
 import { CaretUpDownIcon, SignOutIcon, UserIcon } from "@phosphor-icons/react";
 
@@ -19,21 +18,16 @@ import {
 } from "./ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
-import { Skeleton } from "./ui/skeleton";
 import { SidebarMenuButton } from "./ui/sidebar";
 
 const UserButton = () => {
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user } = useCurrentUser();
   const { mutate } = useLogout();
   const { setTheme, theme } = useTheme();
 
   const pictureUrl =
     process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT! +
     `/avatars/initials?name=${user?.data.name.split(" ").splice(0, 2).join("+")}&width=100&height=100`;
-
-  if (isLoading) return <Skeleton className="size-8 rounded-full" />;
-
-  if (!isLoading && !user) redirect("/sign-in");
 
   return (
     <DropdownMenu modal={false}>

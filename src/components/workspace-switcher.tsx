@@ -1,7 +1,10 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
 import { CaretUpDownIcon, PlusIcon } from "@phosphor-icons/react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   Command,
@@ -11,50 +14,70 @@ import {
   CommandSeparator,
   CommandItem,
 } from "./ui/command";
-import { useListWorkspaces } from "@/features/workspace/hooks/use-list-workspaces";
-import { usePathname, useRouter } from "next/navigation";
-import { useGetWorkspace } from "@/features/workspace/hooks/use-get-workspace";
-import { Skeleton } from "./ui/skeleton";
-import Image from "next/image";
+import { useGetWorkspaces } from "@/features/workspace/hooks/use-get-workspaces";
 
 const WorkspaceSwitcher = () => {
   const router = useRouter();
-  const pathname = usePathname();
-  const workspaceId = pathname.split("/")[2];
+  const params = useParams<{ workspaceId?: string }>();
+  const valueRef = useRef<HTMLDivElement>(null);
 
-  const { data: workspaces, isLoading: isLoadingWorkspaces } =
-    useListWorkspaces();
-  const { data: workspace, isLoading: isLoadingWorkspace } = useGetWorkspace({
-    workspaceId,
-  });
+  const [open, setOpen] = useState(false);
 
-  if (isLoadingWorkspaces || isLoadingWorkspace) {
-    return <Skeleton className="h-10 w-full" />;
-  }
+  const { data: workspaces } = useGetWorkspaces();
+
+  const handleOpenChange = useCallback((open: boolean) => {
+    setOpen(open);
+  }, []);
+
+  const handleSelectWorkspace = useCallback(
+    ({ workspaceId }: { workspaceId: string }) => {
+      if (!workspaces) return;
+
+      const workspace = workspaces.data.rows.find((w) => w.$id === workspaceId);
+
+      if (!workspace) return;
+
+      const contentHTML = `
+      <div class="flex items-center gap-2">
+            <div class="relative rounded-md size-7 overflow-hidden">
+              ${
+                workspace.imageUrl
+                  ? `<img
+                src=${workspace.imageUrl}
+                class="absolute size-7 rounded-md"
+              />`
+                  : ""
+              }
+              <span class="text-sm font-semibold text-white bg-teal-500 w-full h-full text-center flex items-center justify-center">
+                ${workspace.name ? workspace.name.charAt(0).toUpperCase() : "W"}
+              </span>
+            </div>
+            <span class="text-sm font-medium">${workspace.name}</span>
+          </div>
+    `;
+
+      if (valueRef.current) {
+        valueRef.current.innerHTML = contentHTML;
+      }
+    },
+    [workspaces],
+  );
+
+  useEffect(() => {
+    if (valueRef.current && params.workspaceId) {
+      handleSelectWorkspace({ workspaceId: params.workspaceId });
+    }
+  }, []);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger className="flex items-center justify-between p-2 w-full hover:bg-muted rounded-sm">
-        {workspace && workspace.data.name ? (
-          <div className="flex items-center gap-2">
-            <Avatar className="rounded-md size-7">
-              <AvatarImage
-                src={workspace.data.imageUrl}
-                className="rounded-md"
-              />
-              <AvatarFallback className="bg-teal-500 text-white rounded-md text-xs">
-                {workspace.data.name
-                  ? workspace.data.name.charAt(0).toUpperCase()
-                  : "W"}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium">{workspace.data.name}</span>
-          </div>
-        ) : (
+        <div ref={valueRef}>
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Workspace Overview</span>
           </div>
-        )}
+        </div>
+
         <CaretUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
       <PopoverContent align="start" side="bottom" className="p-0 w-60">
@@ -68,8 +91,12 @@ const WorkspaceSwitcher = () => {
                 workspaces.data.rows.map((workspace) => (
                   <CommandItem
                     key={workspace.$id}
-                    value={workspace.name}
-                    onSelect={() => router.push(`/workspace/${workspace.$id}`)}
+                    value={workspace.$id}
+                    onSelect={(value) => {
+                      handleSelectWorkspace({ workspaceId: value });
+                      router.push(`/workspace/${value}`);
+                      setOpen(false);
+                    }}
                   >
                     <div className="relative size-8 overflow-hidden rounded-md">
                       <span className="text-sm font-semibold text-white bg-teal-500 w-full h-full text-center flex items-center justify-center">

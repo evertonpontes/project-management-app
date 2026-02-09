@@ -4,7 +4,7 @@ import { client } from "@/lib/client";
 
 type ResponseType = InferResponseType<typeof client.api.workspace.$get>;
 
-const useListWorkspaces = () => {
+const useGetWorkspaces = () => {
   const query = useQuery<ResponseType, Error>({
     queryKey: ["workspaces"],
     queryFn: async () => {
@@ -22,4 +22,4 @@ const useListWorkspaces = () => {
   return query;
 };
 
-export { useListWorkspaces };
+export { useGetWorkspaces };

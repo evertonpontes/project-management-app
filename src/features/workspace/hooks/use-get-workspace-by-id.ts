@@ -6,7 +6,7 @@ type ResponseType = InferResponseType<
   (typeof client.api.workspace)[":workspaceId"]["$get"]
 >;
 
-const useGetWorkspace = ({ workspaceId }: { workspaceId: string }) => {
+const useGetWorkspaceById = ({ workspaceId }: { workspaceId: string }) => {
   const query = useQuery<ResponseType, Error>({
     queryKey: ["workspace", workspaceId],
     queryFn: async () => {
@@ -26,4 +26,4 @@ const useGetWorkspace = ({ workspaceId }: { workspaceId: string }) => {
   return query;
 };
 
-export { useGetWorkspace };
+export { useGetWorkspaceById };

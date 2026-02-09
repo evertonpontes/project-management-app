@@ -1,12 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { redirect, useParams, usePathname } from "next/navigation";
 import { BellIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
+
 import { Separator } from "./ui/separator";
-import { UserButton } from "./user-button";
-import { WorkspaceSwitcher } from "./workspace-switcher";
 import { Button } from "./ui/button";
-import { useParams, usePathname } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,25 +14,42 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
-import { useGetWorkspace } from "@/features/workspace/hooks/use-get-workspace";
-import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { SidebarTrigger } from "./ui/sidebar";
 
-const Header = () => {
-  const params = useParams<{ workspaceId: string }>();
-  const pathname = usePathname();
-  const { data: workspace } = useGetWorkspace({
-    workspaceId: params.workspaceId,
-  });
+import { capitalize } from "@/lib/utils";
+import { useGetWorkspaces } from "@/features/workspace/hooks/use-get-workspaces";
 
+const Header = () => {
+  const params = useParams<{ workspaceId?: string }>();
+  const pathname = usePathname();
+  const { data: workspaces } = useGetWorkspaces();
+
+  const workspace = workspaces?.data.rows.find(
+    (w) => w.$id === params.workspaceId,
+  );
+
+  // generate routes
   const routes = pathname
     .split("/")
     .filter(Boolean)
-    .map((route) => ({
-      name: route === params.workspaceId ? workspace?.data.name : route,
-      href: `${pathname.split(route)[0]}${route}`,
-    }));
+    .map((route) => {
+      if (!workspace)
+        return {
+          name: capitalize(route),
+          href: `${pathname.split(route)[0]}${route}`,
+        };
+
+      return {
+        name:
+          route === params.workspaceId
+            ? capitalize(workspace?.name)
+            : capitalize(route),
+        href: `${pathname.split(route)[0]}${route}`,
+      };
+    });
+
+  if (params.workspaceId && !workspace) return redirect("/workspace");
 
   return (
     <header className="flex h-full max-h-14 bg-background sticky top-0 w-full items-center px-4 py-2">
@@ -45,32 +61,30 @@ const Header = () => {
               alt="logo"
               fill
               className="absolute object-contain hidden dark:block"
+              loading="eager"
             />
             <Image
               src="/dark-logo.svg"
               alt="logo"
               fill
               className="absolute object-contain dark:hidden"
+              loading="eager"
             />
           </div>
           <SidebarTrigger className="md:hidden" />
-          <Separator orientation="vertical" className="mx-2" />
+          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
           <Breadcrumb className="hidden sm:block">
             <BreadcrumbList>
               {routes.map((route, index) => (
                 <div key={index} className="flex items-center gap-2.5">
                   <BreadcrumbItem>
-                    <BreadcrumbLink
-                      href={route.href}
-                      className={cn(route.href === pathname && "hidden")}
-                    >
-                      {route.name}
-                    </BreadcrumbLink>
-                    <BreadcrumbPage
-                      className={cn(route.href !== pathname && "hidden")}
-                    >
-                      {route.name}
-                    </BreadcrumbPage>
+                    {route.href === pathname ? (
+                      <BreadcrumbPage>{route.name}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink href={route.href}>
+                        {route.name}
+                      </BreadcrumbLink>
+                    )}
                   </BreadcrumbItem>
                   {index < routes.length - 1 && <BreadcrumbSeparator />}
                 </div>

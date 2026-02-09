@@ -10,7 +10,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -20,7 +19,8 @@ import {
 import { UserButton } from "./user-button";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { NavMainContent } from "./nav-main";
-import { NavProjects } from "./nav-projects";
+import { redirect, useParams } from "next/navigation";
+import { useGetWorkspaces } from "@/features/workspace/hooks/use-get-workspaces";
 
 const navMain = [
   {
@@ -46,6 +46,16 @@ const navMain = [
 ];
 
 const AppSidebar = () => {
+  const params = useParams<{ workspaceId?: string }>();
+
+  const { data: workspaces } = useGetWorkspaces();
+
+  const workspace = workspaces?.data.rows.find(
+    (w) => w.$id === params.workspaceId,
+  );
+
+  if (params.workspaceId && !workspace) return redirect("/workspace");
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -58,7 +68,6 @@ const AppSidebar = () => {
       <SidebarSeparator className="mx-0" />
       <SidebarContent>
         <NavMainContent options={navMain} />
-        <NavProjects />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
