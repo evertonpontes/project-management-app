@@ -32,14 +32,16 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           </p>
         </div>
       </div>
-      <div className="flex flex-col items-start justify-between p-6 md:p-10 bg-background">
+      <div className="flex flex-col p-6 md:p-10 bg-background">
         <Link href="/" className="lg:hidden">
           <div className="flex items-center gap-4 tracking-tight text-2xl font-medium text-primary">
             <KanbanIcon weight="fill" size={36} />
             <span className="select-none">Plantask</span>
           </div>
         </Link>
-        {children}
+        <div className="flex h-full items-center justify-center w-full">
+          {children}
+        </div>
       </div>
     </div>
   );
