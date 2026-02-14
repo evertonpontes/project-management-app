@@ -19,12 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { InputPassword } from "@/components/input-password";
 
-import { login } from "../actions/login";
+import { register } from "../actions/register";
 
-type LoginFormProps = React.ComponentProps<"form">;
+type SignUpFormProps = React.ComponentProps<"form">;
 
-const LoginForm = ({ className, ...props }: LoginFormProps) => {
-  const [state, formAction, isPending] = useActionState(login, {});
+const SignUpForm = ({ className, ...props }: SignUpFormProps) => {
+  const [state, formAction, isPending] = useActionState(register, {});
 
   return (
     <form
@@ -34,11 +34,27 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-medium">Welcome back</h1>
+          <h1 className="text-2xl font-bold">Create an account</h1>
+
           <p className="text-muted-foreground text-sm text-balance">
-            Enter your email below to login to your account
+            Enter your details below to create your account
           </p>
         </div>
+        {/*Field Name*/}
+        <Field>
+          <FieldLabel htmlFor="name">Name</FieldLabel>
+          <Input
+            id="name"
+            type="text"
+            name="name"
+            placeholder="Enter your name"
+            aria-invalid={!!state.errors?.name}
+          />
+
+          {state.errors?.name && (
+            <FieldError>{state.errors.name.errors}</FieldError>
+          )}
+        </Field>
 
         {/*Field Email*/}
         <Field>
@@ -60,14 +76,6 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-
-            {/*Forget Password */}
-            <a
-              className="ml-auto text-sm text-muted-foreground underline-offset-4 hover:underline"
-              href="*"
-            >
-              Forgot your password?
-            </a>
           </div>
           <InputPassword
             id="password"
@@ -80,9 +88,25 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
           )}
         </Field>
 
+        {/*Field Confirm Password*/}
+        <Field>
+          <div className="flex items-center">
+            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+          </div>
+          <InputPassword
+            id="confirm-password"
+            name="confirmPassword"
+            placeholder="••••••••"
+            aria-invalid={!!state.errors?.confirmPassword}
+          />
+          {state.errors?.confirmPassword && (
+            <FieldError>{state.errors.confirmPassword.errors}</FieldError>
+          )}
+        </Field>
+
         <Field>
           <Button className="w-full" type="submit">
-            Login
+            Create Account
           </Button>
         </Field>
 
@@ -94,7 +118,7 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
         <Field>
           <Button className="w-full gap-2" type="button" variant="outline">
             <FcGoogle />
-            Login with Google
+            SignUp with Google
           </Button>
         </Field>
 
@@ -102,14 +126,14 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
         <Field>
           <Button className="w-full gap-2" type="button" variant="outline">
             <FaGithub />
-            Login with GitHub
+            SignUp with GitHub
           </Button>
         </Field>
 
         <FieldDescription className="text-center">
-          Don&apos;t have a account?{" "}
-          <Link href={"/sign-up"} className="underline-offset-4 underline">
-            Sign up
+          Already have a account?{" "}
+          <Link href={"/login"} className="underline-offset-4 underline">
+            Login
           </Link>
         </FieldDescription>
       </FieldGroup>
@@ -117,4 +141,4 @@ const LoginForm = ({ className, ...props }: LoginFormProps) => {
   );
 };
 
-export { LoginForm };
+export { SignUpForm };

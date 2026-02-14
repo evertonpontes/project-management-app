@@ -1,14 +1,15 @@
 "use client";
 
+import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { cn } from "@/lib/utils";
-import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 
 type InputPasswordProps = React.ComponentProps<"input">;
 
