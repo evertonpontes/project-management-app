@@ -20,17 +20,37 @@ import { Input } from "@/components/ui/input";
 import { InputPassword } from "@/components/input-password";
 
 import { register } from "../actions/register";
+import { Spinner } from "@/components/ui/spinner";
+import { Controller, useForm } from "react-hook-form";
+import { SignUpFormData, signUpSchema } from "../schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSignUp } from "../hooks/use-sign-up";
 
 type SignUpFormProps = React.ComponentProps<"form">;
 
 const SignUpForm = ({ className, ...props }: SignUpFormProps) => {
-  const [state, formAction, isPending] = useActionState(register, {});
+  const { mutate, isPending } = useSignUp();
+  const form = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onSubmit = (values: SignUpFormData) => {
+    mutate({ json: values });
+
+    form.reset();
+  };
 
   return (
     <form
       {...props}
       className={cn("flex flex-col gap-6", className)}
-      action={formAction}
+      onSubmit={form.handleSubmit(onSubmit)}
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
@@ -40,73 +60,99 @@ const SignUpForm = ({ className, ...props }: SignUpFormProps) => {
             Enter your details below to create your account
           </p>
         </div>
-        {/*Field Name*/}
-        <Field>
-          <FieldLabel htmlFor="name">Name</FieldLabel>
-          <Input
-            id="name"
-            type="text"
-            name="name"
-            placeholder="Enter your name"
-            aria-invalid={!!state.errors?.name}
-          />
 
-          {state.errors?.name && (
-            <FieldError>{state.errors.name.errors}</FieldError>
+        {/*Field Name*/}
+        <Controller
+          name="name"
+          control={form.control}
+          render={({ field, fieldState: { invalid, error } }) => (
+            <Field>
+              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <Input
+                id="name"
+                placeholder="Enter your name"
+                aria-invalid={invalid}
+                {...field}
+              />
+
+              {invalid && <FieldError errors={[error]} />}
+            </Field>
           )}
-        </Field>
+        />
 
         {/*Field Email*/}
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="user@company.com"
-            aria-invalid={!!state.errors?.email}
-          />
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState: { invalid, error } }) => (
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                placeholder="user@company.com"
+                aria-invalid={invalid}
+                {...field}
+              />
 
-          {state.errors?.email && (
-            <FieldError>{state.errors.email.errors}</FieldError>
+              {invalid && <FieldError errors={[error]} />}
+            </Field>
           )}
-        </Field>
+        />
 
         {/*Field Password*/}
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-          </div>
-          <InputPassword
-            id="password"
-            name="password"
-            placeholder="••••••••"
-            aria-invalid={!!state.errors?.password}
-          />
-          {state.errors?.password && (
-            <FieldError>{state.errors.password.errors}</FieldError>
+        <Controller
+          name="password"
+          control={form.control}
+          render={({ field, fieldState: { invalid, error } }) => (
+            <Field>
+              <div className="flex items-center">
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+              </div>
+              <InputPassword
+                id="password"
+                placeholder="••••••••"
+                aria-invalid={invalid}
+                {...field}
+              />
+              {invalid && <FieldError errors={[error]} />}
+            </Field>
           )}
-        </Field>
+        />
 
         {/*Field Confirm Password*/}
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-          </div>
-          <InputPassword
-            id="confirm-password"
-            name="confirmPassword"
-            placeholder="••••••••"
-            aria-invalid={!!state.errors?.confirmPassword}
-          />
-          {state.errors?.confirmPassword && (
-            <FieldError>{state.errors.confirmPassword.errors}</FieldError>
+        <Controller
+          name="confirmPassword"
+          control={form.control}
+          render={({ field, fieldState: { invalid, error } }) => (
+            <Field>
+              <div className="flex items-center">
+                <FieldLabel htmlFor="confirmPassword">
+                  Confirm Password
+                </FieldLabel>
+              </div>
+              <InputPassword
+                id="confirmPassword"
+                placeholder="••••••••"
+                aria-invalid={invalid}
+                {...field}
+              />
+
+              {invalid && <FieldError errors={[error]} />}
+            </Field>
           )}
-        </Field>
+        />
 
         <Field>
-          <Button className="w-full" type="submit">
-            Create Account
+          <Button className="w-full" type="submit" disabled={isPending}>
+            {isPending ? (
+              <>
+                <Spinner />
+                Creating Account
+              </>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </Field>
 
@@ -116,17 +162,27 @@ const SignUpForm = ({ className, ...props }: SignUpFormProps) => {
 
         {/*Login with Google */}
         <Field>
-          <Button className="w-full gap-2" type="button" variant="outline">
+          <Button
+            className="w-full gap-2"
+            type="button"
+            variant="outline"
+            disabled={isPending}
+          >
             <FcGoogle />
-            SignUp with Google
+            Sign Up with Google
           </Button>
         </Field>
 
         {/*Login with GitHub */}
         <Field>
-          <Button className="w-full gap-2" type="button" variant="outline">
+          <Button
+            className="w-full gap-2"
+            type="button"
+            variant="outline"
+            disabled={isPending}
+          >
             <FaGithub />
-            SignUp with GitHub
+            Sign Up with GitHub
           </Button>
         </Field>
 
