@@ -2,25 +2,22 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { InferRequestType, InferResponseType } from "hono";
+import { InferResponseType } from "hono";
 import { toast } from "sonner";
 
 import { client } from "@/lib/client";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-up"]["$post"]
->;
-type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-up"]["$post"]
+  (typeof client.api.auth)["sign-out"]["$post"]
 >;
 
-const useSignUp = () => {
+const useSignOut = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-up"]["$post"]({ json });
+  const mutation = useMutation<ResponseType, Error>({
+    mutationFn: async () => {
+      const response = await client.api.auth["sign-out"]["$post"]();
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -32,7 +29,7 @@ const useSignUp = () => {
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["current"] });
 
-      router.push("/workspace");
+      router.push("/login");
 
       toast.success(data.message);
     },
@@ -44,4 +41,4 @@ const useSignUp = () => {
   return mutation;
 };
 
-export { useSignUp };
+export { useSignOut };

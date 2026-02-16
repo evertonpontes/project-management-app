@@ -1,15 +1,15 @@
 import { AppwriteException, ID } from "node-appwrite";
 
 import { Hono } from "hono";
-import { setCookie } from "hono/cookie";
+import { setCookie, deleteCookie } from "hono/cookie";
 import { zValidator } from "@hono/zod-validator";
 
 import { createAdminClient } from "@/lib/server/appwrite";
 
 import { loginSchema, signUpSchema } from "../schemas";
 import { COOKIE_AUTH_SESSION } from "../config";
-import { cookies } from "next/headers";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { authMiddleware } from "@/lib/auth-middleware";
 
 const auth = new Hono()
   .post("/login", zValidator("json", loginSchema), async (c) => {
@@ -97,6 +97,43 @@ const auth = new Hono()
       }
 
       return c.json({ message: "Internal Server Error" }, 500);
+    }
+  })
+  .post("/sign-out", authMiddleware, async (c) => {
+    try {
+      const account = c.get("account");
+
+      deleteCookie(c, COOKIE_AUTH_SESSION);
+
+      await account.deleteSession({ sessionId: "current" });
+
+      return c.json({ message: "Logout successful" });
+    } catch (error) {
+      console.log("SIGN OUT ERROR: ", error);
+
+      if (error instanceof AppwriteException) {
+        const statusCode = error.code;
+
+        return c.json(
+          { message: error.message },
+          statusCode as ContentfulStatusCode,
+        );
+      }
+
+      return c.json({ message: "Internal Server Error" }, 500);
+    }
+  })
+  .get("/current", authMiddleware, async (c) => {
+    try {
+      const account = c.get("account");
+
+      const user = await account.get();
+
+      return c.json({ data: user });
+    } catch (error) {
+      console.log("CURRENT ERROR: ", error);
+
+      return c.json({ data: null }, 500);
     }
   });
 

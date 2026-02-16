@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ type RequestType = InferRequestType<typeof client.api.auth.login.$post>;
 
 const useLogin = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
@@ -24,10 +25,12 @@ const useLogin = () => {
 
       return response.json();
     },
-    onSuccess: (data) => {
-      toast.success(data.message);
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["current"] });
 
       router.push("/workspace");
+
+      toast.success(data.message);
     },
     onError: (error) => {
       toast.error(error.message);
