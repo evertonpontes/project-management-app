@@ -30,7 +30,7 @@ const store = new Hono()
             file: image,
           });
 
-          imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!}/storage/buckets/${APPWRITE_STORAGE_ID}/files/${fileUploaded.$id}/views?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!}`;
+          imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!}/storage/buckets/${APPWRITE_STORAGE_ID}/files/${fileUploaded.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!}`;
         } else {
           imageUrl = image;
         }
