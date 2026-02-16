@@ -1,5 +1,5 @@
 "use server";
-import { Client, Account } from "node-appwrite";
+import { Client, Account, TablesDB, Storage } from "node-appwrite";
 import { cookies } from "next/headers";
 
 import { COOKIE_AUTH_SESSION } from "@/features/auth/config";
@@ -21,6 +21,12 @@ export async function createSessionClient() {
   return {
     get account() {
       return new Account(client);
+    },
+    get tablesDB() {
+      return new TablesDB(client);
+    },
+    get storage() {
+      return new Storage(client);
     },
   };
 }

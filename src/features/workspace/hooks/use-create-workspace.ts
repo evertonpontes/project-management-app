@@ -7,20 +7,16 @@ import { toast } from "sonner";
 
 import { client } from "@/lib/client";
 
-type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-up"]["$post"]
->;
-type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-up"]["$post"]
->;
+type ResponseType = InferResponseType<typeof client.api.workspace.$post>;
+type RequestType = InferRequestType<typeof client.api.workspace.$post>;
 
-const useSignUp = () => {
+const useCreateWorkspace = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-up"]["$post"]({ json });
+    mutationFn: async ({ form }) => {
+      const response = await client.api.workspace.$post({ form });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -30,9 +26,9 @@ const useSignUp = () => {
       return response.json();
     },
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: ["current"] });
+      await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
 
-      router.push("/workspaces");
+      router.refresh();
 
       toast.success(data.message);
     },
@@ -44,4 +40,4 @@ const useSignUp = () => {
   return mutation;
 };
 
-export { useSignUp };
+export { useCreateWorkspace };

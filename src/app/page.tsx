@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { UserButton } from "@/components/user-button";
 
 export default async function Home() {
   return (
@@ -18,7 +17,6 @@ export default async function Home() {
           render={<Link href="/sign-up">Sign Up</Link>}
           nativeButton={false}
         />
-        <UserButton />
       </div>
     </div>
   );

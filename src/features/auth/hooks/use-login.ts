@@ -28,7 +28,7 @@ const useLogin = () => {
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: ["current"] });
 
-      router.push("/workspace");
+      router.push("/workspaces");
 
       toast.success(data.message);
     },

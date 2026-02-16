@@ -5,9 +5,11 @@ import { createSessionClient } from "@/lib/server/appwrite";
 const getLoggedInUser = async () => {
   try {
     const { account } = await createSessionClient();
-    return await account.get();
+    const user = await account.get();
+
+    return { data: user };
   } catch (error) {
-    return null;
+    return { data: null };
   }
 };
 
