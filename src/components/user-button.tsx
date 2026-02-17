@@ -27,6 +27,7 @@ import {
   SignOutIcon,
   SunIcon,
 } from "@phosphor-icons/react";
+import { SidebarMenuButton } from "./ui/sidebar";
 
 const UserButton = () => {
   const { data: user } = useCurrent();
@@ -38,7 +39,7 @@ const UserButton = () => {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="ghost" className="gap-4">
+          <SidebarMenuButton size="lg" className="gap-2">
             <Avatar size="lg">
               <AvatarFallback className="bg-primary text-primary-foreground">
                 {fallbackName}
@@ -51,7 +52,7 @@ const UserButton = () => {
               </span>
             </div>
             <CaretUpDownIcon />
-          </Button>
+          </SidebarMenuButton>
         }
       />
       <DropdownMenuContent

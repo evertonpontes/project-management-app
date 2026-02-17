@@ -10,7 +10,7 @@ type ResponseType = InferResponseType<typeof client.api.workspace.$get>;
 
 const useGetWorkspaces = () => {
   const query = useQuery<ResponseType>({
-    queryKey: ["current"],
+    queryKey: ["workspaces"],
     queryFn: async () => {
       const response = await client.api.workspace.$get();
 
