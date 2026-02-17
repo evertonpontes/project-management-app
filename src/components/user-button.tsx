@@ -1,9 +1,7 @@
 "use client";
 
-import { redirect } from "next/navigation";
 import { useSignOut } from "@/features/auth/hooks/use-sign-out";
 import { useCurrent } from "@/features/auth/hooks/use-current";
-import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,10 +28,12 @@ import {
 import { SidebarMenuButton } from "./ui/sidebar";
 
 const UserButton = () => {
-  const { data: user } = useCurrent();
+  const { data: user, isLoading } = useCurrent();
   const { mutate } = useSignOut();
 
   const fallbackName = user?.data.name.charAt(0).toLocaleUpperCase();
+
+  if (!isLoading && !user) return null;
 
   return (
     <DropdownMenu>

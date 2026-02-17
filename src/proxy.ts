@@ -4,12 +4,10 @@ import { COOKIE_AUTH_SESSION } from "./features/auth/config";
 
 // specifying protected and public routes
 const protectedRoutes = /^\/workspaces(\/.*)?$/;
-const publicRoutes = ["/", "/login", "/sign-up"];
 
 export default async function proxy(req: NextRequest) {
   // get if current path is public or protected
   const path = req.nextUrl.pathname;
-  const isPublicRoute = publicRoutes.includes(path);
   const isProtectedRoute = protectedRoutes.test(path);
 
   // getting session string from cookies
@@ -19,11 +17,6 @@ export default async function proxy(req: NextRequest) {
   // redirect to '/login' if user is not authenticated
   if (isProtectedRoute && !session?.value) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
-  }
-
-  // redirect to '/workspaces' if user is authenticated
-  if (isPublicRoute && session?.value && path !== "/") {
-    return NextResponse.redirect(new URL("/workspaces", req.nextUrl));
   }
 
   return NextResponse.next();

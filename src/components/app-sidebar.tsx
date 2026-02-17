@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { WorkspaceSwitcher } from "@/features/workspace/components/workspace-switcher";
 import { useGetWorkspaces } from "@/features/workspace/hooks/use-get-workspaces";
+import { useCurrent } from "@/features/auth/hooks/use-current";
 import { UserButton } from "./user-button";
 import { NavMain } from "./nav-main";
 
@@ -46,9 +47,11 @@ const navMain = [
 ];
 
 const AppSidebar = () => {
-  const { data: workspaces, isLoading } = useGetWorkspaces();
+  const { data: workspaces } = useGetWorkspaces();
 
-  if (isLoading) return null;
+  const { data: user, isLoading: isLoadingCurrent } = useCurrent();
+
+  if (!isLoadingCurrent && !user?.data) return null;
 
   return (
     <Sidebar>

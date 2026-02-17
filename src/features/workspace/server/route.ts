@@ -6,7 +6,11 @@ import { zValidator } from "@hono/zod-validator";
 import { createWorkspaceSchema } from "../schemas";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { authMiddleware } from "@/lib/auth-middleware";
-import { APPWRITE_DATABASE_ID, APPWRITE_STORAGE_ID } from "../constants";
+import {
+  APPWRITE_DATABASE_ID,
+  APPWRITE_STORAGE_ID,
+  RoleEnum,
+} from "../constants";
 
 const store = new Hono()
   .post(
@@ -43,6 +47,7 @@ const store = new Hono()
             name,
             imageUrl,
             ownerId: user.$id,
+            workspaceMembers: [{ memberId: user.$id, role: RoleEnum.admin }],
           },
         });
 
@@ -70,12 +75,16 @@ const store = new Hono()
   )
   .get("/", authMiddleware, async (c) => {
     const tablesDB = c.get("tablesDB");
+    const user = c.get("user");
 
     try {
       const workspaces = await tablesDB.listRows({
         databaseId: APPWRITE_DATABASE_ID,
         tableId: "workspaces",
-        queries: [Query.orderDesc("$createdAt")],
+        queries: [
+          Query.equal("workspaceMembers.memberId", [user.$id]),
+          Query.orderDesc("$createdAt"),
+        ],
       });
 
       return c.json({ data: workspaces }, 200);

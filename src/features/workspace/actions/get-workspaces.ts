@@ -6,11 +6,16 @@ import { APPWRITE_DATABASE_ID } from "../constants";
 
 const getWorkspaces = async (): Promise<{ data: Models.RowList | null }> => {
   try {
-    const { tablesDB } = await createSessionClient();
+    const { tablesDB, account } = await createSessionClient();
+    const user = await account.get();
+
     const workspaces = await tablesDB.listRows({
       databaseId: APPWRITE_DATABASE_ID,
       tableId: "workspaces",
-      queries: [Query.orderDesc("$createdAt")],
+      queries: [
+        Query.equal("workspaceMembers.memberId", [user.$id]),
+        Query.orderDesc("$createdAt"),
+      ],
     });
 
     return { data: JSON.parse(JSON.stringify(workspaces)) };

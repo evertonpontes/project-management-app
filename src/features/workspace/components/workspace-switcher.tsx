@@ -41,32 +41,40 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <div className="w-full max-w-8">
-                    <AspectRatio
-                      ratio={1 / 1}
-                      className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg"
-                    >
-                      {activeWorkspace.imageUrl ? (
-                        <Image
-                          src={activeWorkspace.imageUrl}
-                          alt="workspace-logo"
-                          fill
-                          className="rounded-lg object-cover"
-                        />
-                      ) : (
-                        <span className="flex h-full items-center justify-center rounded-lg w-full">
-                          {activeWorkspace.name.charAt(0).toLocaleUpperCase()}
-                        </span>
-                      )}
-                    </AspectRatio>
-                  </div>
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {activeWorkspace.name}
-                  </span>
-                </div>
+                {activeWorkspace ? (
+                  <>
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                      <div className="w-full max-w-8">
+                        <AspectRatio
+                          ratio={1 / 1}
+                          className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg"
+                        >
+                          {activeWorkspace.imageUrl ? (
+                            <Image
+                              src={activeWorkspace.imageUrl}
+                              alt="workspace-logo"
+                              fill
+                              className="rounded-lg object-cover"
+                            />
+                          ) : (
+                            <span className="flex h-full items-center justify-center rounded-lg w-full">
+                              {activeWorkspace.name
+                                .charAt(0)
+                                .toLocaleUpperCase()}
+                            </span>
+                          )}
+                        </AspectRatio>
+                      </div>
+                    </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">
+                        {activeWorkspace.name}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <span className="font-semibold truncate">Workspaces</span>
+                )}
                 <CaretUpDownIcon className="ml-auto" />
               </SidebarMenuButton>
             }
@@ -81,41 +89,49 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
               <DropdownMenuLabel className="text-muted-foreground text-xs">
                 Workspaces
               </DropdownMenuLabel>
-              {workspaces.rows.map((workspace, index) => (
-                <DropdownMenuItem
-                  key={workspace.$id}
-                  onClick={() => setActiveWorkspace(workspace)}
-                  className="gap-2 p-2 group"
-                >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <div className="w-full max-w-8">
-                      <AspectRatio
-                        ratio={1 / 1}
-                        className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg"
-                      >
-                        {workspace.imageUrl ? (
-                          <Image
-                            src={workspace.imageUrl}
-                            alt="workspace-logo"
-                            fill
-                            className="rounded-lg object-cover"
-                          />
-                        ) : (
-                          <span className="flex h-full items-center justify-center rounded-lg w-full focus:text-primary-foreground group-focus:text-primary-foreground!">
-                            {workspace.name.charAt(0).toLocaleUpperCase()}
-                          </span>
-                        )}
-                      </AspectRatio>
+              {workspaces?.total ? (
+                workspaces.rows.map((workspace, index) => (
+                  <DropdownMenuItem
+                    key={workspace.$id}
+                    onClick={() => setActiveWorkspace(workspace)}
+                    className="gap-2 p-2 group"
+                  >
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                      <div className="w-full max-w-8">
+                        <AspectRatio
+                          ratio={1 / 1}
+                          className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg"
+                        >
+                          {workspace.imageUrl ? (
+                            <Image
+                              src={workspace.imageUrl}
+                              alt="workspace-logo"
+                              fill
+                              className="rounded-lg object-cover"
+                            />
+                          ) : (
+                            <span className="flex h-full items-center justify-center rounded-lg w-full focus:text-primary-foreground group-focus:text-primary-foreground!">
+                              {workspace.name.charAt(0).toLocaleUpperCase()}
+                            </span>
+                          )}
+                        </AspectRatio>
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">
-                      {workspace.name}
-                    </span>
-                  </div>
-                  <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              ))}
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">
+                        {workspace.name}
+                      </span>
+                    </div>
+                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <div className="flex p-2 w-full">
+                  <span className="text-xs text-muted-foreground mx-auto">
+                    No workspaces found.
+                  </span>
+                </div>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">

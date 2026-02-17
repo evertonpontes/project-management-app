@@ -1,11 +1,13 @@
+import { redirect } from "next/navigation";
 import { getLoggedInUser } from "@/features/auth/actions/get-current";
 import CreateWorkspaceForm from "@/features/workspace/components/create-workspace-form";
-import { redirect } from "next/navigation";
 
 const WorkspacesPage = async () => {
   const user = await getLoggedInUser();
 
-  if (!user) redirect("/login");
+  if (!user.data) {
+    redirect("/login");
+  }
 
   return (
     <main className="flex min-h-svh justify-center items-center w-full gap-6 md:gap-10 bg-muted">
