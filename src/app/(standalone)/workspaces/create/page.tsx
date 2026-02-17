@@ -1,12 +1,9 @@
 import { getLoggedInUser } from "@/features/auth/actions/get-current";
+import CreateWorkspaceForm from "@/features/workspace/components/create-workspace-form";
 import { QueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 
-interface WorkspaceIdProps {
-  params: Promise<{ workspaceId: string }>;
-}
-
-const WorkspaceIdPage = async ({ params }: WorkspaceIdProps) => {
+const CreateWorkspacePage = async () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -24,7 +21,13 @@ const WorkspaceIdPage = async ({ params }: WorkspaceIdProps) => {
     redirect("/login");
   }
 
-  return <div>Enter</div>;
+  return (
+    <main className="flex min-h-svh w-full items-center justify-center bg-muted">
+      <div className="w-full max-w-lg bg-card p-8 rounded-lg ring ring-muted-foreground/10 shadow-xs">
+        <CreateWorkspaceForm />
+      </div>
+    </main>
+  );
 };
 
-export default WorkspaceIdPage;
+export default CreateWorkspacePage;

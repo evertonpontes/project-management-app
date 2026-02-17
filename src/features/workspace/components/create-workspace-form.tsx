@@ -19,6 +19,7 @@ import { useCreateWorkspace } from "../hooks/use-create-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import { UploadSimpleIcon } from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void;
@@ -142,7 +143,12 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
         />
 
         <Field orientation="horizontal" className="justify-between">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className={cn(!onCancel && "invisible")}
+          >
             Cancel
           </Button>
           <Button disabled={isPending} type="submit">
