@@ -40,8 +40,8 @@ const UserButton = () => {
       <DropdownMenuTrigger
         render={
           <SidebarMenuButton size="lg" className="gap-2">
-            <Avatar size="lg">
-              <AvatarFallback className="bg-primary text-primary-foreground">
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
                 {fallbackName}
               </AvatarFallback>
             </Avatar>

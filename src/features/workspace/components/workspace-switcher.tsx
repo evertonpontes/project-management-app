@@ -39,7 +39,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
             render={
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border border-sidebar-border"
               >
                 {activeWorkspace ? (
                   <>

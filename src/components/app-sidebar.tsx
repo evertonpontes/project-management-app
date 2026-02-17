@@ -54,7 +54,7 @@ const AppSidebar = () => {
   if (!isLoadingCurrent && !user?.data) return null;
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <WorkspaceSwitcher workspaces={workspaces?.data!} />
       </SidebarHeader>
