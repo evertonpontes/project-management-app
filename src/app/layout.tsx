@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/components/query-provider";
 
@@ -31,10 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          <Toaster />
-          {children}
-        </QueryProvider>
+        <NuqsAdapter>
+          <QueryProvider>
+            <Toaster />
+            {children}
+          </QueryProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

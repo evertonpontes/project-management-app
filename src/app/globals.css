@@ -125,3 +125,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.drawer-modal {
+  backface-visibility: hidden;
+  -webkit-filter: blur(0);
+  filter: blur(0);
+}

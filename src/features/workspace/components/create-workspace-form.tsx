@@ -15,13 +15,16 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
 import { CreateWorkspaceFormData, createWorkspaceSchema } from "../schemas";
-import { Textarea } from "@/components/ui/textarea";
 import { useCreateWorkspace } from "../hooks/use-create-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import { UploadSimpleIcon } from "@phosphor-icons/react";
 
-const CreateWorkspaceForm = () => {
+interface CreateWorkspaceFormProps {
+  onCancel?: () => void;
+}
+
+const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   const { mutate, isPending } = useCreateWorkspace();
   const form = useForm<CreateWorkspaceFormData>({
     resolver: zodResolver(createWorkspaceSchema),
@@ -138,8 +141,11 @@ const CreateWorkspaceForm = () => {
           )}
         />
 
-        <Field>
-          <Button disabled={isPending} className="w-full" type="submit">
+        <Field orientation="horizontal" className="justify-between">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button disabled={isPending} type="submit">
             {isPending ? (
               <>
                 <Spinner />

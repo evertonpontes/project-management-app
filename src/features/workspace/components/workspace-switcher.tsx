@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Models } from "node-appwrite";
 
@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/sidebar";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { CaretUpDownIcon, PlusIcon } from "@phosphor-icons/react";
+import { useParams, useRouter } from "next/navigation";
+import { useCreateWorkspaceModal } from "../hooks/use-create-workspace-modal";
 
 interface WorkspaceSwitcherProps {
   workspaces: Models.RowList<Models.Row & { [key: string]: string }>;
@@ -29,7 +31,17 @@ interface WorkspaceSwitcherProps {
 
 const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
   const { isMobile } = useSidebar();
-  const [activeWorkspace, setActiveWorkspace] = useState(workspaces?.rows[0]);
+  const { onOpen } = useCreateWorkspaceModal();
+  const router = useRouter();
+  const params = useParams<{ workspaceId?: string }>();
+
+  const currentWorkspace = useMemo(() => {
+    if (!workspaces?.total) return null;
+
+    const workspace = workspaces.rows.find((w) => w.$id === params.workspaceId);
+
+    return workspace ? workspace : null;
+  }, [params]);
 
   return (
     <SidebarMenu>
@@ -41,7 +53,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border border-sidebar-border"
               >
-                {activeWorkspace ? (
+                {currentWorkspace ? (
                   <>
                     <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
                       <div className="w-full max-w-8">
@@ -49,16 +61,16 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                           ratio={1 / 1}
                           className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg"
                         >
-                          {activeWorkspace.imageUrl ? (
+                          {currentWorkspace.imageUrl ? (
                             <Image
-                              src={activeWorkspace.imageUrl}
+                              src={currentWorkspace.imageUrl}
                               alt="workspace-logo"
                               fill
                               className="rounded-lg object-cover"
                             />
                           ) : (
                             <span className="flex h-full items-center justify-center rounded-lg w-full">
-                              {activeWorkspace.name
+                              {currentWorkspace.name
                                 .charAt(0)
                                 .toLocaleUpperCase()}
                             </span>
@@ -68,7 +80,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
-                        {activeWorkspace.name}
+                        {currentWorkspace.name}
                       </span>
                     </div>
                   </>
@@ -93,7 +105,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                 workspaces.rows.map((workspace, index) => (
                   <DropdownMenuItem
                     key={workspace.$id}
-                    onClick={() => setActiveWorkspace(workspace)}
+                    onClick={() => router.push(`/workspaces/${workspace.$id}`)}
                     className="gap-2 p-2 group"
                   >
                     <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
@@ -134,7 +146,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
               )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem className="gap-2 p-2" onClick={onOpen}>
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <PlusIcon className="size-4" />
               </div>

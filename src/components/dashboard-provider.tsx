@@ -2,6 +2,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getLoggedInUser } from "@/features/auth/actions/get-current";
 import { getWorkspaces } from "@/features/workspace/actions/get-workspaces";
+import { CreateWorkspaceModal } from "@/features/workspace/components/create-workspace-modal";
 import { asyncComponent } from "@/lib/async-component";
 import {
   dehydrate,
@@ -36,6 +37,7 @@ const DashboardProvider = asyncComponent(
 
     return (
       <HydrationBoundary state={dehydrate(queryClient)}>
+        <CreateWorkspaceModal />
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>
