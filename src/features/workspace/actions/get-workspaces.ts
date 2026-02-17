@@ -1,10 +1,10 @@
 "use server";
 
-import { Query } from "node-appwrite";
+import { Models, Query } from "node-appwrite";
 import { createSessionClient } from "@/lib/server/appwrite";
 import { APPWRITE_DATABASE_ID } from "../constants";
 
-const getWorkspaces = async () => {
+const getWorkspaces = async (): Promise<{ data: Models.RowList | null }> => {
   try {
     const { tablesDB } = await createSessionClient();
     const workspaces = await tablesDB.listRows({
@@ -13,7 +13,7 @@ const getWorkspaces = async () => {
       queries: [Query.orderDesc("$createdAt")],
     });
 
-    return { data: workspaces };
+    return { data: JSON.parse(JSON.stringify(workspaces)) };
   } catch (error) {
     return { data: null };
   }

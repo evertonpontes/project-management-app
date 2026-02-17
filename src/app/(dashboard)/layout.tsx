@@ -1,5 +1,6 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Suspense } from "react";
+import DashboardProvider from "@/components/dashboard-provider";
+import { DashboardLoading } from "@/components/dashboard-loading";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -7,12 +8,9 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <main className="flex min-h-svh flex-col w-full">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardProvider children={children} />
+    </Suspense>
   );
 };
 

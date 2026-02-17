@@ -85,7 +85,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                 <DropdownMenuItem
                   key={workspace.$id}
                   onClick={() => setActiveWorkspace(workspace)}
-                  className="gap-2 p-2"
+                  className="gap-2 p-2 group"
                 >
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
                     <div className="w-full max-w-8">
@@ -101,7 +101,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
                             className="rounded-lg object-cover"
                           />
                         ) : (
-                          <span className="flex h-full items-center justify-center rounded-lg w-full">
+                          <span className="flex h-full items-center justify-center rounded-lg w-full focus:text-primary-foreground group-focus:text-primary-foreground!">
                             {workspace.name.charAt(0).toLocaleUpperCase()}
                           </span>
                         )}
