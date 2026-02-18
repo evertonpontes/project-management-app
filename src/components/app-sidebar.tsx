@@ -62,13 +62,6 @@ const AppSidebar = () => {
         <NavMain options={navMain} />
         <SidebarGroup />
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <UserButton />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

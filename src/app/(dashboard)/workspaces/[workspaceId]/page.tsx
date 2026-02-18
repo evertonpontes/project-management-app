@@ -24,7 +24,7 @@ const WorkspaceIdPage = async ({ params }: WorkspaceIdProps) => {
     redirect("/login");
   }
 
-  return <div>Enter</div>;
+  return <div className="flex flex-1 w-full bg-muted">Enter</div>;
 };
 
 export default WorkspaceIdPage;

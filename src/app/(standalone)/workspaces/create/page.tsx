@@ -22,7 +22,7 @@ const CreateWorkspacePage = async () => {
   }
 
   return (
-    <main className="flex min-h-svh w-full items-center justify-center bg-muted">
+    <main className="flex flex-1 w-full items-center justify-center bg-muted">
       <div className="w-full max-w-lg bg-card p-8 rounded-lg ring ring-muted-foreground/10 shadow-xs">
         <CreateWorkspaceForm />
       </div>

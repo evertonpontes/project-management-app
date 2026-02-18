@@ -14,7 +14,8 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { Button } from "./ui/button";
-import { BellIcon } from "@phosphor-icons/react/dist/ssr";
+import { BellIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr";
+import { UserButton } from "./user-button";
 
 interface DashboardProviderProps {
   children: React.ReactNode;
@@ -47,13 +48,21 @@ const DashboardProvider = asyncComponent(
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>
-            <header className=" sticky top-0 w-full bg-card shadow-xs">
+            <header className=" sticky top-0 w-full bg-sidebar border-b border-sidebar-accent-foreground/10 shadow-xs">
               <nav className="flex w-full items-center justify-between p-2">
                 <SidebarTrigger />
 
-                <Button variant="ghost" size="icon">
-                  <BellIcon className="size-5 text-card-foreground/85" />
-                </Button>
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="ghost" size="icon">
+                    <MagnifyingGlassIcon className="size-5 text-card-foreground/85" />
+                  </Button>
+
+                  <Button variant="ghost" size="icon">
+                    <BellIcon className="size-5 text-card-foreground/85" />
+                  </Button>
+
+                  <UserButton />
+                </div>
               </nav>
             </header>
             <main className="flex h-full grow flex-col w-full">{children}</main>

@@ -1,5 +1,10 @@
+import { Button } from "@/components/ui/button";
 import { UserButton } from "@/components/user-button";
-import { KanbanIcon } from "@phosphor-icons/react/dist/ssr";
+import {
+  BellIcon,
+  KanbanIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 interface StandaloneLayoutProps {
@@ -8,21 +13,28 @@ interface StandaloneLayoutProps {
 
 const StandaloneLayout = ({ children }: StandaloneLayoutProps) => {
   return (
-    <main className="flex min-h-svh flex-col w-full">
-      <header className=" sticky top-0 w-full bg-card shadow-xs">
+    <div className="flex min-h-svh flex-col w-full">
+      <header className=" sticky top-0 w-full bg-sidebar border-b border-sidebar-accent-foreground/10 shadow-xs">
         <nav className="flex w-full items-center justify-between p-2">
-          <Link href="/">
-            <div className="flex items-center gap-2 tracking-tight text-2xl font-medium text-primary">
-              <KanbanIcon weight="fill" size={24} />
-              <span className="select-none text-base">Plantask</span>
-            </div>
+          <Link href={"/"}>
+            <KanbanIcon weight="fill" className="text-primary size-8" />
           </Link>
 
-          <UserButton rounded="full" sidebar={false} variant="Icon" />
+          <div className="flex items-center justify-center gap-2">
+            <Button variant="ghost" size="icon">
+              <MagnifyingGlassIcon className="size-5 text-card-foreground/85" />
+            </Button>
+
+            <Button variant="ghost" size="icon">
+              <BellIcon className="size-5 text-card-foreground/85" />
+            </Button>
+
+            <UserButton />
+          </div>
         </nav>
       </header>
       {children}
-    </main>
+    </div>
   );
 };
 

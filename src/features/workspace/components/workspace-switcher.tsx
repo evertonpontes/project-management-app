@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import { Models } from "node-appwrite";
+import { CaretUpDownIcon, PlusIcon } from "@phosphor-icons/react";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   DropdownMenu,
@@ -21,8 +23,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { CaretUpDownIcon, PlusIcon } from "@phosphor-icons/react";
-import { useParams, useRouter } from "next/navigation";
 import { useCreateWorkspaceModal } from "../hooks/use-create-workspace-modal";
 
 interface WorkspaceSwitcherProps {
@@ -41,7 +41,7 @@ const WorkspaceSwitcher = ({ workspaces }: WorkspaceSwitcherProps) => {
     const workspace = workspaces.rows.find((w) => w.$id === params.workspaceId);
 
     return workspace ? workspace : null;
-  }, [params]);
+  }, [params, workspaces]);
 
   return (
     <SidebarMenu>

@@ -3,14 +3,13 @@ import { AppwriteException, ID, Query } from "node-appwrite";
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
-import { createWorkspaceSchema } from "../schemas";
+import { createWorkspaceSchema, editWorkspaceSchema } from "../schemas";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { authMiddleware } from "@/lib/auth-middleware";
-import {
-  APPWRITE_DATABASE_ID,
-  APPWRITE_STORAGE_ID,
-  RoleEnum,
-} from "../constants";
+import { APPWRITE_DATABASE_ID, APPWRITE_STORAGE_ID } from "../constants";
+import { generateInviteCode } from "@/lib/utils";
+import { RoleEnum } from "@/features/member/types";
+import { getMember } from "@/features/member/queries/get-member";
 
 const store = new Hono()
   .post(
@@ -47,7 +46,8 @@ const store = new Hono()
             name,
             imageUrl,
             ownerId: user.$id,
-            workspaceMembers: [{ memberId: user.$id, role: RoleEnum.admin }],
+            inviteCode: generateInviteCode(8),
+            workspaceMembers: [{ memberId: user.$id, role: RoleEnum.OWNER }],
           },
         });
 
@@ -93,6 +93,73 @@ const store = new Hono()
 
       return c.json({ data: null }, 500);
     }
-  });
+  })
+  .patch(
+    "/:workspaceId",
+    zValidator("form", editWorkspaceSchema),
+    authMiddleware,
+    async (c) => {
+      const workspaceId = c.req.param("workspaceId");
+      const { name, image } = c.req.valid("form");
+
+      const tablesDB = c.get("tablesDB");
+      const user = c.get("user");
+      const storage = c.get("storage");
+
+      let imageUrl: string | undefined;
+
+      // Get the member of workspace
+      const member = await getMember({ workspaceId, userId: user.$id });
+
+      // Verify if it not exist or if have role 'MEMBER'
+      if (!member || member.role === RoleEnum.MEMBER) {
+        return c.json({ message: "Unauthorized" }, 401);
+      }
+
+      try {
+        if (image && image instanceof File) {
+          const fileUploaded = await storage.createFile({
+            bucketId: APPWRITE_STORAGE_ID,
+            fileId: ID.unique(),
+            file: image,
+          });
+
+          imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!}/storage/buckets/${APPWRITE_STORAGE_ID}/files/${fileUploaded.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!}`;
+        } else {
+          imageUrl = image;
+        }
+
+        await tablesDB.updateRow({
+          databaseId: APPWRITE_DATABASE_ID,
+          tableId: "workspaces",
+          rowId: workspaceId,
+          data: {
+            name,
+            imageUrl,
+          },
+        });
+
+        return c.json(
+          {
+            message: "Workspace updated successfully",
+          },
+          201,
+        );
+      } catch (error) {
+        console.log("UPDATE WORKSPACE ERROR: ", error);
+
+        if (error instanceof AppwriteException) {
+          const statusCode = error.code;
+
+          return c.json(
+            { message: error.message },
+            statusCode as ContentfulStatusCode,
+          );
+        }
+
+        return c.json({ message: "Internal Server Error" }, 500);
+      }
+    },
+  );
 
 export default store;
