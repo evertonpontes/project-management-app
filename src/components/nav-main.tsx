@@ -1,3 +1,5 @@
+"use client";
+
 import { Icon } from "@phosphor-icons/react";
 import {
   SidebarGroup,
@@ -6,8 +8,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "./ui/sidebar";
-import { Button } from "./ui/button";
 import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface NavMainProps {
   options: {
@@ -18,27 +21,37 @@ interface NavMainProps {
 }
 
 const NavMain = ({ options }: NavMainProps) => {
+  const params = useParams<{ workspaceId?: string }>();
+
+  const pathname = usePathname();
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {options.map((option) => (
-            <SidebarMenuItem key={option.title}>
-              <SidebarMenuButton tooltip={option.title}>
-                <Button
-                  variant="ghost"
-                  nativeButton={false}
-                  className="p-0 font-normal"
-                  render={
-                    <Link href={option.url}>
-                      <option.icon />
-                      <span>{option.title}</span>
-                    </Link>
-                  }
-                />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {options.map((option) => {
+            const fullPath = `/workspaces/${params.workspaceId}${option.url}`;
+
+            const Icon = option.icon;
+
+            const isActive = fullPath === pathname;
+
+            return (
+              <SidebarMenuItem key={option.title}>
+                <SidebarMenuButton render={<Link href={fullPath} />}>
+                  <Icon />
+                  <span
+                    className={cn(
+                      "text-sidebar-foreground font-normal",
+                      isActive && "font-semibold",
+                    )}
+                  >
+                    {option.title}
+                  </span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

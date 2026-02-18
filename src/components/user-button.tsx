@@ -26,33 +26,86 @@ import {
   SunIcon,
 } from "@phosphor-icons/react";
 import { SidebarMenuButton } from "./ui/sidebar";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
+import { ComponentProps } from "react";
 
-const UserButton = () => {
+interface UserButtonProps {
+  sidebar?: boolean;
+  variant?: "Default" | "Icon";
+  rounded?: "full" | "lg";
+}
+
+const UserButton = ({
+  sidebar = true,
+  variant = "Default",
+  rounded = "lg",
+}: UserButtonProps) => {
   const { data: user, isLoading } = useCurrent();
   const { mutate } = useSignOut();
+
+  const Comp = ({ ...props }: ComponentProps<"button">) =>
+    sidebar ? (
+      <SidebarMenuButton
+        variant="default"
+        size="lg"
+        className={cn(
+          "gap-2",
+          rounded === "full" ? "rounded-full p-0" : "rounded-lg",
+          variant === "Icon" && "w-8 h-8",
+        )}
+        {...props}
+      />
+    ) : (
+      <Button
+        variant="ghost"
+        size="lg"
+        className={cn(
+          "gap-2",
+          rounded === "full" ? "rounded-full p-0" : "rounded-lg",
+          variant === "Icon" && "w-8 h-8",
+        )}
+        {...props}
+      />
+    );
 
   const fallbackName = user?.data.name.charAt(0).toLocaleUpperCase();
 
   if (!isLoading && !user) return null;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         render={
-          <SidebarMenuButton size="lg" className="gap-2">
-            <Avatar className="h-8 w-8 rounded-lg">
-              <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
+          <Comp>
+            <Avatar
+              className={cn(
+                "h-8 w-8",
+                rounded === "full" ? "rounded-full" : "rounded-lg",
+              )}
+            >
+              <AvatarFallback
+                className={cn(
+                  "bg-primary text-primary-foreground",
+                  rounded === "full" ? "rounded-full" : "rounded-lg",
+                )}
+              >
                 {fallbackName}
               </AvatarFallback>
             </Avatar>
-            <div className="flex flex-col text-start">
+            <div
+              className={cn(
+                "flex flex-col text-start",
+                variant === "Icon" && "hidden",
+              )}
+            >
               <span className="truncate font-semibold">{user?.data.name}</span>
               <span className="truncate text-muted-foreground text-xs">
                 {user?.data.email}
               </span>
             </div>
-            <CaretUpDownIcon />
-          </SidebarMenuButton>
+            <CaretUpDownIcon className={cn(variant === "Icon" && "hidden")} />
+          </Comp>
         }
       />
       <DropdownMenuContent

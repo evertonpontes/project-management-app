@@ -26,7 +26,7 @@ import { NavMain } from "./nav-main";
 const navMain = [
   {
     title: "Overview",
-    url: "/",
+    url: "",
     icon: GaugeIcon,
   },
   {

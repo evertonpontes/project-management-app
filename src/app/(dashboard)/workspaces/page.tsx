@@ -26,7 +26,7 @@ const WorkspacesPage = async () => {
     redirect("/login");
   }
 
-  if (!workspaces.data?.rows) {
+  if (!workspaces.data?.total) {
     redirect("/workspaces/create");
   }
 
