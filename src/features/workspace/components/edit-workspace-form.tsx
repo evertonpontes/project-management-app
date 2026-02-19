@@ -19,9 +19,13 @@ import { EditWorkspaceFormData, editWorkspaceSchema } from "../schemas";
 import { useEditWorkspace } from "../hooks/use-edit-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
-import { ArrowLeftIcon, UploadSimpleIcon } from "@phosphor-icons/react";
+import { KeyIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { Workspace } from "../types";
 import { useRouter } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { formatDate } from "@/lib/utils";
+import { useConfirm } from "@/hooks/use-confirm";
+import { useDeleteWorkspace } from "../hooks/use-delete-workspace";
 
 interface EditWorkspaceFormProps {
   initialValues: Workspace;
@@ -29,10 +33,21 @@ interface EditWorkspaceFormProps {
 
 const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
   const router = useRouter();
+  const [DeleteDialog, confirmDelete] = useConfirm(
+    "Are you absolutely sure?",
+    "This action cannot be undone. This will permanently delete your workspace from our servers.",
+    "destructive",
+  );
 
   const { mutate, isPending } = useEditWorkspace({
     workspaceId: initialValues.$id,
   });
+
+  const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } =
+    useDeleteWorkspace({
+      workspaceId: initialValues.$id,
+    });
+
   const form = useForm<EditWorkspaceFormData>({
     resolver: zodResolver(editWorkspaceSchema),
     defaultValues: {
@@ -40,6 +55,21 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
       image: initialValues.imageUrl ? initialValues.imageUrl : undefined,
     },
   });
+
+  const handleDelete = async () => {
+    const ok = await confirmDelete();
+
+    if (!ok) return;
+
+    deleteWorkspace(
+      {
+        param: { workspaceId: initialValues.$id },
+      },
+      {
+        onSuccess: () => router.push("/workspaces"),
+      },
+    );
+  };
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -63,28 +93,15 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      <FieldGroup>
-        <div className="flex flex-col items-start gap-1 text-center">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => router.push(`/workspaces/${initialValues.$id}`)}
-          >
-            <ArrowLeftIcon />
-            Back
-          </Button>
-          <h1 className="text-2xl font-medium mx-auto">{initialValues.name}</h1>
-        </div>
-
-        <FieldSeparator />
-
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <DeleteDialog />
+      <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
         {/*Field Workspace Image*/}
         <Controller
           name="image"
           control={form.control}
           render={({ field, fieldState: { invalid, error } }) => (
-            <Field>
+            <Field className="px-8 mb-8">
               <FieldLabel htmlFor="image">Workspace Logo</FieldLabel>
               <div className="flex items-center w-full gap-4">
                 <div className="w-full max-w-42">
@@ -140,8 +157,8 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
           name="name"
           control={form.control}
           render={({ field, fieldState: { invalid, error } }) => (
-            <Field>
-              <FieldLabel htmlFor="mame">Name</FieldLabel>
+            <Field className="px-8">
+              <FieldLabel htmlFor="name">Name</FieldLabel>
               <Input
                 id="name"
                 placeholder="Enter workspace name"
@@ -154,7 +171,9 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
           )}
         />
 
-        <Field orientation="horizontal" className="justify-end">
+        <FieldSeparator />
+
+        <Field orientation="horizontal" className="justify-end px-8">
           <Button disabled={isPending} type="submit">
             {isPending ? (
               <>
@@ -164,6 +183,41 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
             ) : (
               "Save Changes"
             )}
+          </Button>
+        </Field>
+      </FieldGroup>
+
+      {/*Delete Workspace */}
+      <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
+        <div className="flex flex-col md:flex-row gap-4 w-full px-8">
+          <div className="flex flex-col text-start gap-2">
+            <h2 className="text-xl font-semibold">Delete Workspace</h2>
+            <p className="text-sm leading-4 text-muted-foreground">
+              The Workspace will be permanently deleted, including all the
+              associated data. This action is irreversible.
+            </p>
+          </div>
+          <Alert className="w-full bg-muted/20">
+            <AlertTitle>{initialValues.name}</AlertTitle>
+            <AlertDescription className="flex items-center gap-2 leading-4">
+              {initialValues.$id}
+              <KeyIcon />
+            </AlertDescription>
+            <AlertDescription>
+              Last Updated{" "}
+              {formatDate(initialValues.$updatedAt, "MMM dd, yyyy, HH:mm")}
+            </AlertDescription>
+          </Alert>
+        </div>
+        <FieldSeparator />
+        <Field orientation="horizontal" className="justify-end px-8">
+          <Button
+            disabled={isPending}
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
+          >
+            Delete Workspace
           </Button>
         </Field>
       </FieldGroup>

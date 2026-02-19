@@ -20,6 +20,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import { UploadSimpleIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void;
@@ -34,6 +35,8 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     },
   });
 
+  const router = useRouter();
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onSubmit = (values: CreateWorkspaceFormData) => {
@@ -42,7 +45,14 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
       image: values.image instanceof File ? values.image : "",
     };
 
-    mutate({ form: finalValues });
+    mutate(
+      { form: finalValues },
+      {
+        onSuccess: () => {
+          router.push("/workspaces");
+        },
+      },
+    );
 
     form.reset();
   };
@@ -129,7 +139,7 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
           control={form.control}
           render={({ field, fieldState: { invalid, error } }) => (
             <Field>
-              <FieldLabel htmlFor="mame">Name</FieldLabel>
+              <FieldLabel htmlFor="name">Name</FieldLabel>
               <Input
                 id="name"
                 placeholder="Enter workspace name"

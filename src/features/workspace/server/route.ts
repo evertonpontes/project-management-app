@@ -143,7 +143,7 @@ const store = new Hono()
           {
             message: "Workspace updated successfully",
           },
-          201,
+          200,
         );
       } catch (error) {
         console.log("UPDATE WORKSPACE ERROR: ", error);
@@ -160,6 +160,48 @@ const store = new Hono()
         return c.json({ message: "Internal Server Error" }, 500);
       }
     },
-  );
+  )
+  .delete("/:workspaceId", authMiddleware, async (c) => {
+    const workspaceId = c.req.param("workspaceId");
+
+    const tablesDB = c.get("tablesDB");
+    const user = c.get("user");
+
+    // Get the member of workspace
+    const member = await getMember({ workspaceId, userId: user.$id });
+
+    // Verify if it not exist or if have role 'MEMBER'
+    if (!member || member.role === RoleEnum.MEMBER) {
+      return c.json({ message: "Unauthorized" }, 401);
+    }
+
+    try {
+      await tablesDB.deleteRow({
+        databaseId: APPWRITE_DATABASE_ID,
+        tableId: "workspaces",
+        rowId: workspaceId,
+      });
+
+      return c.json(
+        {
+          message: "Workspace deleted successfully",
+        },
+        200,
+      );
+    } catch (error) {
+      console.log("DELETE WORKSPACE ERROR: ", error);
+
+      if (error instanceof AppwriteException) {
+        const statusCode = error.code;
+
+        return c.json(
+          { message: error.message },
+          statusCode as ContentfulStatusCode,
+        );
+      }
+
+      return c.json({ message: "Internal Server Error" }, 500);
+    }
+  });
 
 export default store;
