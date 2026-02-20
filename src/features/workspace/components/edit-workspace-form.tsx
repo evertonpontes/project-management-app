@@ -124,7 +124,7 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <DeleteDialog />
       <ResetInviteCodeDialog />
       <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
@@ -206,7 +206,7 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
         <FieldSeparator />
 
         <Field orientation="horizontal" className="justify-end px-8">
-          <Button disabled={isPending} type="submit">
+          <Button disabled={isPending} type="submit" variant="outline">
             {isPending ? (
               <>
                 <Spinner />
@@ -245,7 +245,7 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
           <Button
             disabled={isPending || isResetingInvideCode}
             type="button"
-            variant="destructive"
+            variant="outline"
             onClick={handleResetInviteCode}
           >
             Reset Invite Code

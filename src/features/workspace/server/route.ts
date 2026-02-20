@@ -10,6 +10,8 @@ import { APPWRITE_DATABASE_ID, APPWRITE_STORAGE_ID } from "../constants";
 import { generateInviteCode } from "@/lib/utils";
 import { RoleEnum } from "@/features/member/types";
 import { getMember } from "@/features/member/queries/get-member";
+import z from "zod";
+import { Workspace } from "../types";
 
 const store = new Hono()
   .post(
@@ -247,6 +249,73 @@ const store = new Hono()
 
       return c.json({ message: "Internal Server Error" }, 500);
     }
-  });
+  })
+  .post(
+    "/:workspaceId/join",
+    authMiddleware,
+    zValidator(
+      "json",
+      z.object({
+        code: z.string(),
+      }),
+    ),
+    async (c) => {
+      const workspaceId = c.req.param("workspaceId");
+      const { code } = c.req.valid("json");
+
+      const tablesDB = c.get("tablesDB");
+      const user = c.get("user");
+
+      // Get the member of workspace
+      const member = await getMember({ workspaceId, userId: user.$id });
+
+      if (member) {
+        return c.json({ message: "Already a member" }, 400);
+      }
+
+      const workspace = await tablesDB.getRow<Workspace>({
+        databaseId: APPWRITE_DATABASE_ID,
+        tableId: "workspaces",
+        rowId: workspaceId,
+      });
+
+      if (workspace.inviteCode !== code) {
+        return c.json({ message: "Invalid invite code" }, 400);
+      }
+
+      try {
+        await tablesDB.createRow({
+          databaseId: APPWRITE_DATABASE_ID,
+          tableId: "workspace-members",
+          rowId: ID.unique(),
+          data: {
+            memberId: user.$id,
+            role: RoleEnum.MEMBER,
+            workspaceId: workspaceId,
+          },
+        });
+
+        return c.json(
+          {
+            message: "Joined workspace successfully",
+          },
+          200,
+        );
+      } catch (error) {
+        console.log("JOIN WORKSPACE ERROR: ", error);
+
+        if (error instanceof AppwriteException) {
+          const statusCode = error.code;
+
+          return c.json(
+            { message: error.message },
+            statusCode as ContentfulStatusCode,
+          );
+        }
+
+        return c.json({ message: "Internal Server Error" }, 500);
+      }
+    },
+  );
 
 export default store;
