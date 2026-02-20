@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
 import { CreateWorkspaceFormData, createWorkspaceSchema } from "../schemas";
-import { useCreateWorkspace } from "../hooks/use-create-workspace";
+import { useCreateWorkspace } from "../api/use-create-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import { UploadSimpleIcon } from "@phosphor-icons/react";
@@ -45,14 +45,7 @@ const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
       image: values.image instanceof File ? values.image : "",
     };
 
-    mutate(
-      { form: finalValues },
-      {
-        onSuccess: () => {
-          router.push("/workspaces");
-        },
-      },
-    );
+    mutate({ form: finalValues });
 
     form.reset();
   };

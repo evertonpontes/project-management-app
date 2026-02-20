@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { InputPassword } from "@/components/input-password";
 
 import { LoginFormData, loginSchema } from "../schemas";
-import { useLogin } from "../hooks/use-login";
+import { useLogin } from "../api/use-login";
 import { Spinner } from "@/components/ui/spinner";
 
 type LoginFormProps = React.ComponentProps<"form">;

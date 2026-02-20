@@ -16,25 +16,31 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
 import { EditWorkspaceFormData, editWorkspaceSchema } from "../schemas";
-import { useEditWorkspace } from "../hooks/use-edit-workspace";
+import { useEditWorkspace } from "../api/use-edit-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import { CopyIcon, KeyIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { Workspace } from "../types";
-import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatDate } from "@/lib/utils";
 import { useConfirm } from "@/hooks/use-confirm";
-import { useDeleteWorkspace } from "../hooks/use-delete-workspace";
+import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import { toast } from "sonner";
-import { useResetInviteCode } from "../hooks/use-reset-invite-code";
+import { useResetInviteCode } from "../api/use-reset-invite-code";
 
 interface EditWorkspaceFormProps {
   initialValues: Workspace;
 }
 
 const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
-  const router = useRouter();
+  const form = useForm<EditWorkspaceFormData>({
+    resolver: zodResolver(editWorkspaceSchema),
+    defaultValues: {
+      ...initialValues,
+      image: initialValues.imageUrl ? initialValues.imageUrl : undefined,
+    },
+  });
+
   const [DeleteDialog, confirmDelete] = useConfirm(
     "Are you absolutely sure?",
     "This action cannot be undone. This will permanently delete your workspace from our servers.",
@@ -47,41 +53,22 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
     "destructive",
   );
 
-  const { mutate, isPending } = useEditWorkspace({
-    workspaceId: initialValues.$id,
-  });
+  const { mutate, isPending } = useEditWorkspace();
 
   const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } =
-    useDeleteWorkspace({
-      workspaceId: initialValues.$id,
-    });
+    useDeleteWorkspace();
 
   const { mutate: resetInviteCode, isPending: isResetingInvideCode } =
-    useResetInviteCode({
-      workspaceId: initialValues.$id,
-    });
-
-  const form = useForm<EditWorkspaceFormData>({
-    resolver: zodResolver(editWorkspaceSchema),
-    defaultValues: {
-      ...initialValues,
-      image: initialValues.imageUrl ? initialValues.imageUrl : undefined,
-    },
-  });
+    useResetInviteCode();
 
   const handleDelete = async () => {
     const ok = await confirmDelete();
 
     if (!ok) return;
 
-    deleteWorkspace(
-      {
-        param: { workspaceId: initialValues.$id },
-      },
-      {
-        onSuccess: () => router.push("/workspaces"),
-      },
-    );
+    deleteWorkspace({
+      param: { workspaceId: initialValues.$id },
+    });
   };
 
   const handleResetInviteCode = async () => {
@@ -94,8 +81,6 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
     });
   };
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const onSubmit = (values: EditWorkspaceFormData) => {
     const finalValues = {
       ...values,
@@ -104,6 +89,8 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
 
     mutate({ form: finalValues, param: { workspaceId: initialValues.$id } });
   };
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

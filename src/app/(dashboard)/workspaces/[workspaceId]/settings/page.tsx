@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { getLoggedInUser } from "@/features/auth/actions/get-current";
-import { getWorkspaceById } from "@/features/workspace/actions/get-workspace-by-id";
+import { getLoggedInUser } from "@/features/auth/queries/get-current";
+import { getWorkspaceById } from "@/features/workspace/queries/get-workspace-by-id";
 import EditWorkspaceForm from "@/features/workspace/components/edit-workspace-form";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { QueryClient } from "@tanstack/react-query";

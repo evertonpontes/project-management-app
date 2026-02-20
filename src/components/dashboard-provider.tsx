@@ -4,8 +4,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getLoggedInUser } from "@/features/auth/actions/get-current";
-import { getWorkspaces } from "@/features/workspace/actions/get-workspaces";
+import { getLoggedInUser } from "@/features/auth/queries/get-current";
+import { getWorkspaces } from "@/features/workspace/queries/get-workspaces";
 import { CreateWorkspaceModal } from "@/features/workspace/components/create-workspace-modal";
 import { asyncComponent } from "@/lib/async-component";
 import {

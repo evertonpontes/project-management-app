@@ -1,4 +1,4 @@
-import { getLoggedInUser } from "@/features/auth/actions/get-current";
+import { getLoggedInUser } from "@/features/auth/queries/get-current";
 import CreateWorkspaceForm from "@/features/workspace/components/create-workspace-form";
 import { QueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";

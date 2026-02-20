@@ -7,30 +7,42 @@ import { toast } from "sonner";
 
 import { client } from "@/lib/client";
 
-type ResponseType = InferResponseType<typeof client.api.workspace.$post>;
-type RequestType = InferRequestType<typeof client.api.workspace.$post>;
+type ResponseType = InferResponseType<
+  (typeof client.api.workspace)[":workspaceId"]["reset-invite-code"]["$post"],
+  200
+>;
+type RequestType = InferRequestType<
+  (typeof client.api.workspace)[":workspaceId"]["reset-invite-code"]["$post"]
+>;
 
-const useCreateWorkspace = () => {
+const useResetInviteCode = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.workspace.$post({ form });
+    mutationFn: async ({ param }) => {
+      const response = await client.api.workspace[":workspaceId"][
+        "reset-invite-code"
+      ]["$post"]({
+        param,
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message);
+        throw new Error(errorData.error);
       }
 
       return response.json();
     },
-    onSuccess: async (data) => {
+    onSuccess: async (response) => {
       await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["workspace", response.data.$id],
+      });
 
       router.refresh();
 
-      toast.success(data.message);
+      toast.success("Reseted invite code");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -40,4 +52,4 @@ const useCreateWorkspace = () => {
   return mutation;
 };
 
-export { useCreateWorkspace };
+export { useResetInviteCode };

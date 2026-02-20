@@ -19,12 +19,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { InputPassword } from "@/components/input-password";
 
-import { register } from "../actions/register";
 import { Spinner } from "@/components/ui/spinner";
 import { Controller, useForm } from "react-hook-form";
 import { SignUpFormData, signUpSchema } from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSignUp } from "../hooks/use-sign-up";
+import { useSignUp } from "../api/use-sign-up";
 
 type SignUpFormProps = React.ComponentProps<"form">;
 

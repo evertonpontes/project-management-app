@@ -1,44 +1,38 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
-  CardAction,
 } from "@/components/ui/card";
-
-import { useJoinWorkspace } from "../hooks/use-join-workspace";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+import { useJoinWorkspace } from "../api/use-join-workspace";
+
 interface JoiWorkspaceFormProps {
   workspaceName: string;
+  workspaceId: string;
+  code: string;
 }
 
-const JoinWorkspaceForm = ({ workspaceName }: JoiWorkspaceFormProps) => {
+const JoinWorkspaceForm = ({
+  workspaceName,
+  workspaceId,
+  code,
+}: JoiWorkspaceFormProps) => {
   const router = useRouter();
-  const params = useParams<{ inviteCode: string; workspaceId: string }>();
 
-  const { mutate, isPending } = useJoinWorkspace({
-    workspaceId: params.workspaceId,
-  });
+  const { mutate, isPending } = useJoinWorkspace();
 
   const onSubmit = async () => {
-    mutate(
-      {
-        json: { code: params.inviteCode },
-        param: { workspaceId: params.workspaceId },
-      },
-      {
-        onSuccess: () => {
-          router.push(`/workspaces/${params.workspaceId}`);
-        },
-      },
-    );
+    mutate({
+      json: { code },
+      param: { workspaceId },
+    });
   };
 
   return (

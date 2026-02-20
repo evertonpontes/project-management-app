@@ -4,7 +4,6 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
 import { createWorkspaceSchema, editWorkspaceSchema } from "../schemas";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import { authMiddleware } from "@/lib/auth-middleware";
 import { APPWRITE_DATABASE_ID, APPWRITE_STORAGE_ID } from "../constants";
 import { generateInviteCode } from "@/lib/utils";
@@ -16,9 +15,10 @@ import { Workspace } from "../types";
 const store = new Hono()
   .post(
     "/",
-    zValidator("form", createWorkspaceSchema),
     authMiddleware,
+    zValidator("form", createWorkspaceSchema),
     async (c) => {
+      // CREATE WORKSPACE
       const { name, image } = c.req.valid("form");
 
       const tablesDB = c.get("tablesDB");
@@ -40,7 +40,7 @@ const store = new Hono()
           imageUrl = image;
         }
 
-        await tablesDB.createRow({
+        const workspace = await tablesDB.createRow({
           databaseId: APPWRITE_DATABASE_ID,
           tableId: "workspaces",
           rowId: ID.unique(),
@@ -55,7 +55,7 @@ const store = new Hono()
 
         return c.json(
           {
-            message: "Workspace created successfully",
+            data: workspace,
           },
           201,
         );
@@ -63,19 +63,15 @@ const store = new Hono()
         console.log("CREATE WORKSPACE ERROR: ", error);
 
         if (error instanceof AppwriteException) {
-          const statusCode = error.code;
-
-          return c.json(
-            { message: error.message },
-            statusCode as ContentfulStatusCode,
-          );
+          return c.json({ error: error.message }, 400);
         }
 
-        return c.json({ message: "Internal Server Error" }, 500);
+        return c.json({ error: "Internal Server Error" }, 500);
       }
     },
   )
   .get("/", authMiddleware, async (c) => {
+    // GET WORKSPACES
     const tablesDB = c.get("tablesDB");
     const user = c.get("user");
 
@@ -93,14 +89,15 @@ const store = new Hono()
     } catch (error) {
       console.log("GET WORKSPACES ERROR: ", error);
 
-      return c.json({ data: null }, 500);
+      return c.json({ error: "Error fetching workspaces" }, 500);
     }
   })
   .patch(
     "/:workspaceId",
-    zValidator("form", editWorkspaceSchema),
     authMiddleware,
+    zValidator("form", editWorkspaceSchema),
     async (c) => {
+      // EDIT WORKSPACE
       const workspaceId = c.req.param("workspaceId");
       const { name, image } = c.req.valid("form");
 
@@ -115,7 +112,7 @@ const store = new Hono()
 
       // Verify if it not exist or if have role 'MEMBER'
       if (!member || member.role === RoleEnum.MEMBER) {
-        return c.json({ message: "Unauthorized" }, 401);
+        return c.json({ error: "Unauthorized" }, 401);
       }
 
       try {
@@ -131,7 +128,7 @@ const store = new Hono()
           imageUrl = image;
         }
 
-        await tablesDB.updateRow({
+        const workspace = await tablesDB.updateRow({
           databaseId: APPWRITE_DATABASE_ID,
           tableId: "workspaces",
           rowId: workspaceId,
@@ -143,7 +140,7 @@ const store = new Hono()
 
         return c.json(
           {
-            message: "Workspace updated successfully",
+            data: workspace,
           },
           200,
         );
@@ -151,19 +148,15 @@ const store = new Hono()
         console.log("UPDATE WORKSPACE ERROR: ", error);
 
         if (error instanceof AppwriteException) {
-          const statusCode = error.code;
-
-          return c.json(
-            { message: error.message },
-            statusCode as ContentfulStatusCode,
-          );
+          return c.json({ error: error.message }, 400);
         }
 
-        return c.json({ message: "Internal Server Error" }, 500);
+        return c.json({ error: "Internal Server Error" }, 500);
       }
     },
   )
   .delete("/:workspaceId", authMiddleware, async (c) => {
+    // DELETE WORKSPACE
     const workspaceId = c.req.param("workspaceId");
 
     const tablesDB = c.get("tablesDB");
@@ -174,7 +167,7 @@ const store = new Hono()
 
     // Verify if it not exist or if have role 'MEMBER'
     if (!member || member.role === RoleEnum.MEMBER) {
-      return c.json({ message: "Unauthorized" }, 401);
+      return c.json({ error: "Unauthorized" }, 401);
     }
 
     try {
@@ -186,7 +179,7 @@ const store = new Hono()
 
       return c.json(
         {
-          message: "Workspace deleted successfully",
+          data: workspaceId,
         },
         200,
       );
@@ -194,18 +187,14 @@ const store = new Hono()
       console.log("DELETE WORKSPACE ERROR: ", error);
 
       if (error instanceof AppwriteException) {
-        const statusCode = error.code;
-
-        return c.json(
-          { message: error.message },
-          statusCode as ContentfulStatusCode,
-        );
+        return c.json({ error: error.message }, 400);
       }
 
-      return c.json({ message: "Internal Server Error" }, 500);
+      return c.json({ error: "Internal Server Error" }, 500);
     }
   })
   .post("/:workspaceId/reset-invite-code", authMiddleware, async (c) => {
+    // RESET INVITE CODE
     const workspaceId = c.req.param("workspaceId");
 
     const tablesDB = c.get("tablesDB");
@@ -216,11 +205,11 @@ const store = new Hono()
 
     // Verify if it not exist or if have role 'MEMBER'
     if (!member || member.role === RoleEnum.MEMBER) {
-      return c.json({ message: "Unauthorized" }, 401);
+      return c.json({ error: "Unauthorized" }, 401);
     }
 
     try {
-      await tablesDB.updateRow({
+      const workspace = await tablesDB.updateRow({
         databaseId: APPWRITE_DATABASE_ID,
         tableId: "workspaces",
         rowId: workspaceId,
@@ -231,7 +220,7 @@ const store = new Hono()
 
       return c.json(
         {
-          message: "Workspace invite code updated successfully",
+          data: workspace,
         },
         200,
       );
@@ -239,15 +228,10 @@ const store = new Hono()
       console.log("RESET INVITE CODE WORKSPACE ERROR: ", error);
 
       if (error instanceof AppwriteException) {
-        const statusCode = error.code;
-
-        return c.json(
-          { message: error.message },
-          statusCode as ContentfulStatusCode,
-        );
+        return c.json({ error: error.message }, 400);
       }
 
-      return c.json({ message: "Internal Server Error" }, 500);
+      return c.json({ error: "Internal Server Error" }, 500);
     }
   })
   .post(
@@ -260,6 +244,7 @@ const store = new Hono()
       }),
     ),
     async (c) => {
+      // JOIN WORKSPACE
       const workspaceId = c.req.param("workspaceId");
       const { code } = c.req.valid("json");
 
@@ -270,7 +255,7 @@ const store = new Hono()
       const member = await getMember({ workspaceId, userId: user.$id });
 
       if (member) {
-        return c.json({ message: "Already a member" }, 400);
+        return c.json({ error: "Already a member" }, 400);
       }
 
       const workspace = await tablesDB.getRow<Workspace>({
@@ -280,11 +265,11 @@ const store = new Hono()
       });
 
       if (workspace.inviteCode !== code) {
-        return c.json({ message: "Invalid invite code" }, 400);
+        return c.json({ error: "Invalid invite code" }, 400);
       }
 
       try {
-        await tablesDB.createRow({
+        const workspace = await tablesDB.createRow({
           databaseId: APPWRITE_DATABASE_ID,
           tableId: "workspace-members",
           rowId: ID.unique(),
@@ -297,7 +282,7 @@ const store = new Hono()
 
         return c.json(
           {
-            message: "Joined workspace successfully",
+            data: workspace,
           },
           200,
         );
@@ -305,15 +290,10 @@ const store = new Hono()
         console.log("JOIN WORKSPACE ERROR: ", error);
 
         if (error instanceof AppwriteException) {
-          const statusCode = error.code;
-
-          return c.json(
-            { message: error.message },
-            statusCode as ContentfulStatusCode,
-          );
+          return c.json({ error: error.message }, 400);
         }
 
-        return c.json({ message: "Internal Server Error" }, 500);
+        return c.json({ error: "Internal Server Error" }, 500);
       }
     },
   );

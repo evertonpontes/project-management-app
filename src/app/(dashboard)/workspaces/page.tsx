@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
-import { getLoggedInUser } from "@/features/auth/actions/get-current";
-import { getWorkspaces } from "@/features/workspace/actions/get-workspaces";
+import { getLoggedInUser } from "@/features/auth/queries/get-current";
+import { getWorkspaces } from "@/features/workspace/queries/get-workspaces";
 
 const WorkspacesPage = async () => {
   const queryClient = new QueryClient({

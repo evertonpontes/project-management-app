@@ -16,7 +16,7 @@ const StandaloneLayout = ({ children }: StandaloneLayoutProps) => {
     <div className="flex min-h-svh flex-col w-full">
       <header className=" sticky top-0 w-full bg-sidebar border-b border-sidebar-accent-foreground/10 shadow-xs">
         <nav className="flex w-full items-center justify-between p-2">
-          <Link href={"/"}>
+          <Link href={"/workspaces"}>
             <KanbanIcon weight="fill" className="text-primary size-8" />
           </Link>
 

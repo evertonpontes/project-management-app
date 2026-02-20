@@ -1,7 +1,7 @@
 "use client";
 
-import { useSignOut } from "@/features/auth/hooks/use-sign-out";
-import { useCurrent } from "@/features/auth/hooks/use-current";
+import { useSignOut } from "@/features/auth/api/use-sign-out";
+import { useCurrent } from "@/features/auth/api/use-current";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
