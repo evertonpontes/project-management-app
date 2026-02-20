@@ -19,13 +19,15 @@ import { EditWorkspaceFormData, editWorkspaceSchema } from "../schemas";
 import { useEditWorkspace } from "../hooks/use-edit-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
-import { KeyIcon, UploadSimpleIcon } from "@phosphor-icons/react";
+import { CopyIcon, KeyIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import { Workspace } from "../types";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatDate } from "@/lib/utils";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteWorkspace } from "../hooks/use-delete-workspace";
+import { toast } from "sonner";
+import { useResetInviteCode } from "../hooks/use-reset-invite-code";
 
 interface EditWorkspaceFormProps {
   initialValues: Workspace;
@@ -39,12 +41,23 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
     "destructive",
   );
 
+  const [ResetInviteCodeDialog, confirmResetInviteCode] = useConfirm(
+    "Are you absolutely sure?",
+    "This will invalidate the current invite code.",
+    "destructive",
+  );
+
   const { mutate, isPending } = useEditWorkspace({
     workspaceId: initialValues.$id,
   });
 
   const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } =
     useDeleteWorkspace({
+      workspaceId: initialValues.$id,
+    });
+
+  const { mutate: resetInviteCode, isPending: isResetingInvideCode } =
+    useResetInviteCode({
       workspaceId: initialValues.$id,
     });
 
@@ -71,6 +84,16 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
     );
   };
 
+  const handleResetInviteCode = async () => {
+    const ok = await confirmResetInviteCode();
+
+    if (!ok) return;
+
+    resetInviteCode({
+      param: { workspaceId: initialValues.$id },
+    });
+  };
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onSubmit = (values: EditWorkspaceFormData) => {
@@ -92,9 +115,18 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
     e.target.value = "";
   };
 
+  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+
+  const handleCopyInviteLink = () => {
+    navigator.clipboard
+      .writeText(fullInviteLink)
+      .then(() => toast.success("Invite link copied to clipboard"));
+  };
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
       <DeleteDialog />
+      <ResetInviteCodeDialog />
       <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
         {/*Field Workspace Image*/}
         <Controller
@@ -187,6 +219,40 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
         </Field>
       </FieldGroup>
 
+      {/*Invite Code */}
+      <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
+        <div className="flex flex-col gap-4 w-full px-8">
+          <div className="flex flex-col text-start gap-2">
+            <h2 className="text-xl font-semibold">Invite Members</h2>
+            <p className="text-sm leading-4 text-muted-foreground">
+              Use the invite link to add members to your workspace.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Input disabled value={fullInviteLink} />
+            <Button
+              className="size-10"
+              variant="secondary"
+              type="button"
+              onClick={handleCopyInviteLink}
+            >
+              <CopyIcon />
+            </Button>
+          </div>
+        </div>
+        <FieldSeparator />
+        <Field orientation="horizontal" className="justify-end px-8">
+          <Button
+            disabled={isPending || isResetingInvideCode}
+            type="button"
+            variant="destructive"
+            onClick={handleResetInviteCode}
+          >
+            Reset Invite Code
+          </Button>
+        </Field>
+      </FieldGroup>
+
       {/*Delete Workspace */}
       <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
         <div className="flex flex-col md:flex-row gap-4 w-full px-8">
@@ -212,7 +278,7 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
         <FieldSeparator />
         <Field orientation="horizontal" className="justify-end px-8">
           <Button
-            disabled={isPending}
+            disabled={isPending || isDeletingWorkspace}
             type="button"
             variant="destructive"
             onClick={handleDelete}

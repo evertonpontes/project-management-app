@@ -47,11 +47,11 @@ const useConfirm = (
     >
       <Card className="w-full h-full ring-0 shadow-none py-0 pt-4">
         <CardContent className="px-0">
-          <CardHeader className="px-8 border-b border-muted-foreground/10 shadow-xs">
+          <CardHeader className="px-8 py-4">
             <CardTitle className="">{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
           </CardHeader>
-          <div className="pt-4 flex gap-4 flex-col lg:flex-row items-center lg:justify-end px-8 bg-muted pb-4">
+          <div className="pt-4 flex gap-4 flex-col lg:flex-row items-center lg:justify-end px-8 bg-muted pb-4 border-t border-muted-foreground/10">
             <Button
               onClick={handleCancel}
               variant="outline"
