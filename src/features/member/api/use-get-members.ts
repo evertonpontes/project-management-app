@@ -14,7 +14,7 @@ interface UseGetMemberProps {
 }
 
 const useGetMembers = ({ workspaceId }: UseGetMemberProps) => {
-  const query = useQuery<ResponseType, Error, RequestType>({
+  const query = useQuery<ResponseType>({
     queryKey: ["members", workspaceId],
     queryFn: async () => {
       const response = await client.api.member.$get({ query: { workspaceId } });
