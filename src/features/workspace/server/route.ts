@@ -12,7 +12,7 @@ import { getMember } from "@/features/member/queries/get-member";
 import z from "zod";
 import { Workspace } from "../types";
 
-const store = new Hono()
+const app = new Hono()
   .post(
     "/",
     authMiddleware,
@@ -49,7 +49,7 @@ const store = new Hono()
             imageUrl,
             ownerId: user.$id,
             inviteCode: generateInviteCode(8),
-            workspaceMembers: [{ memberId: user.$id, role: RoleEnum.OWNER }],
+            members: [{ memberId: user.$id, role: RoleEnum.ADMIN }],
           },
         });
 
@@ -80,7 +80,7 @@ const store = new Hono()
         databaseId: APPWRITE_DATABASE_ID,
         tableId: "workspaces",
         queries: [
-          Query.equal("workspaceMembers.memberId", [user.$id]),
+          Query.equal("members.memberId", [user.$id]),
           Query.orderDesc("$createdAt"),
         ],
       });
@@ -110,8 +110,8 @@ const store = new Hono()
       // Get the member of workspace
       const member = await getMember({ workspaceId, userId: user.$id });
 
-      // Verify if it not exist or if have role 'MEMBER'
-      if (!member || member.role === RoleEnum.MEMBER) {
+      // Verify if it not exist or if not ADMIN
+      if (!member || member.role !== RoleEnum.ADMIN) {
         return c.json({ error: "Unauthorized" }, 401);
       }
 
@@ -165,8 +165,8 @@ const store = new Hono()
     // Get the member of workspace
     const member = await getMember({ workspaceId, userId: user.$id });
 
-    // Verify if it not exist or if have role 'MEMBER'
-    if (!member || member.role === RoleEnum.MEMBER) {
+    // Verify if it not exist or if not ADMIN
+    if (!member || member.role !== RoleEnum.ADMIN) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
@@ -203,8 +203,8 @@ const store = new Hono()
     // Get the member of workspace
     const member = await getMember({ workspaceId, userId: user.$id });
 
-    // Verify if it not exist or if have role 'MEMBER'
-    if (!member || member.role === RoleEnum.MEMBER) {
+    // Verify if it not exist or if not ADMIN
+    if (!member || member.role !== RoleEnum.ADMIN) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
@@ -258,20 +258,20 @@ const store = new Hono()
         return c.json({ error: "Already a member" }, 400);
       }
 
-      const workspace = await tablesDB.getRow<Workspace>({
-        databaseId: APPWRITE_DATABASE_ID,
-        tableId: "workspaces",
-        rowId: workspaceId,
-      });
-
-      if (workspace.inviteCode !== code) {
-        return c.json({ error: "Invalid invite code" }, 400);
-      }
-
       try {
-        const workspace = await tablesDB.createRow({
+        const workspace = await tablesDB.getRow<Workspace>({
           databaseId: APPWRITE_DATABASE_ID,
-          tableId: "workspace-members",
+          tableId: "workspaces",
+          rowId: workspaceId,
+        });
+
+        if (workspace.inviteCode !== code) {
+          return c.json({ error: "Invalid invite code" }, 400);
+        }
+
+        await tablesDB.createRow({
+          databaseId: APPWRITE_DATABASE_ID,
+          tableId: "members",
           rowId: ID.unique(),
           data: {
             memberId: user.$id,
@@ -298,4 +298,4 @@ const store = new Hono()
     },
   );
 
-export default store;
+export default app;

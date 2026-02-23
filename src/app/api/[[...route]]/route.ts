@@ -3,11 +3,13 @@ import { handle } from "hono/vercel";
 
 import auth from "@/features/auth/server/route";
 import workspace from "@/features/workspace/server/route";
+import member from "@/features/member/server/route";
 
 const app = new Hono()
   .basePath("/api")
   .route("/auth", auth)
-  .route("/workspace", workspace);
+  .route("/workspace", workspace)
+  .route("/member", member);
 
 const route = app;
 

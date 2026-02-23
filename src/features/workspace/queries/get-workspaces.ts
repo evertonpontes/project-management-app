@@ -13,7 +13,7 @@ const getWorkspaces = async (): Promise<{ data: Models.RowList | null }> => {
       databaseId: APPWRITE_DATABASE_ID,
       tableId: "workspaces",
       queries: [
-        Query.equal("workspaceMembers.memberId", [user.$id]),
+        Query.equal("members.memberId", [user.$id]),
         Query.orderDesc("$createdAt"),
       ],
     });

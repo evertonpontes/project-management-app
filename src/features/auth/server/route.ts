@@ -11,7 +11,7 @@ import { COOKIE_AUTH_SESSION } from "../config";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { authMiddleware } from "@/lib/auth-middleware";
 
-const auth = new Hono()
+const app = new Hono()
   .post("/login", zValidator("json", loginSchema), async (c) => {
     const { email, password } = c.req.valid("json");
 
@@ -137,4 +137,4 @@ const auth = new Hono()
     }
   });
 
-export default auth;
+export default app;

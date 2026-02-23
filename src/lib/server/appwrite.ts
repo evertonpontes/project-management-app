@@ -1,5 +1,5 @@
 "use server";
-import { Client, Account, TablesDB, Storage } from "node-appwrite";
+import { Client, Account, TablesDB, Storage, Users } from "node-appwrite";
 import { cookies } from "next/headers";
 
 import { COOKIE_AUTH_SESSION } from "@/features/auth/config";
@@ -40,6 +40,10 @@ export async function createAdminClient() {
   return {
     get account() {
       return new Account(client);
+    },
+
+    get users() {
+      return new Users(client);
     },
   };
 }

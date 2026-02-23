@@ -13,7 +13,7 @@ const getMember = async ({ workspaceId, userId }: GetMemberProps) => {
 
     const member = await tablesDB.listRows({
       databaseId: APPWRITE_DATABASE_ID,
-      tableId: "workspace-members",
+      tableId: "members",
       queries: [
         Query.equal("workspaceId", workspaceId),
         Query.equal("memberId", userId),

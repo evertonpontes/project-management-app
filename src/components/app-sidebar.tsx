@@ -10,17 +10,13 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { WorkspaceSwitcher } from "@/features/workspace/components/workspace-switcher";
 import { useGetWorkspaces } from "@/features/workspace/api/use-get-workspaces";
 import { useCurrent } from "@/features/auth/api/use-current";
-import { UserButton } from "./user-button";
 import { NavMain } from "./nav-main";
 
 const navMain = [
@@ -40,8 +36,8 @@ const navMain = [
     icon: GearIcon,
   },
   {
-    title: "Teams",
-    url: "/teams",
+    title: "Members",
+    url: "/members",
     icon: UsersThreeIcon,
   },
 ];
