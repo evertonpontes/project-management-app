@@ -19,7 +19,12 @@ import { EditWorkspaceFormData, editWorkspaceSchema } from "../schemas";
 import { useEditWorkspace } from "../api/use-edit-workspace";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
-import { CopyIcon, KeyIcon, UploadSimpleIcon } from "@phosphor-icons/react";
+import {
+  CopyIcon,
+  KeyIcon,
+  NotePencilIcon,
+  UploadSimpleIcon,
+} from "@phosphor-icons/react";
 import { Workspace } from "../types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatDate } from "@/lib/utils";
@@ -27,6 +32,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import { toast } from "sonner";
 import { useResetInviteCode } from "../api/use-reset-invite-code";
+import Link from "next/link";
 
 interface EditWorkspaceFormProps {
   initialValues: Workspace;
@@ -236,6 +242,32 @@ const EditWorkspaceForm = ({ initialValues }: EditWorkspaceFormProps) => {
             onClick={handleResetInviteCode}
           >
             Reset Invite Code
+          </Button>
+        </Field>
+      </FieldGroup>
+
+      {/*Add custom field */}
+      <FieldGroup className="w-full bg-card rounded-lg ring ring-muted-foreground/10 shadow-xs py-6">
+        <div className="flex flex-col gap-4 w-full px-8">
+          <div className="flex flex-col text-start gap-2">
+            <h2 className="text-xl font-semibold">Custom fields</h2>
+            <p className="text-sm leading-4 text-muted-foreground">
+              Add custom fields to your tasks.
+            </p>
+          </div>
+        </div>
+        <Field orientation="horizontal" className="justify-end px-8">
+          <Button
+            disabled={isPending || isResetingInvideCode}
+            type="button"
+            variant="outline"
+            render={
+              <Link href={`/workspaces/${initialValues.$id}/custom-fields`} />
+            }
+            nativeButton={false}
+          >
+            <NotePencilIcon />
+            Add Custom Field
           </Button>
         </Field>
       </FieldGroup>

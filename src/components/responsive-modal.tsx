@@ -5,6 +5,15 @@ import useMedia from "use-media";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { cn } from "@/lib/utils";
+import {
+  BaseDrawer,
+  BaseDrawerBackdrop,
+  BaseDrawerContent,
+  BaseDrawerPopup,
+  BaseDrawerPortal,
+  BaseDrawerTitle,
+  BaseDrawerViewport,
+} from "./ui/base-drawer";
 
 interface ResponsiveModalProps extends React.ComponentProps<"div"> {
   open: boolean;
@@ -32,12 +41,19 @@ const ResponsiveModal = ({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="drawer-modal">
-        <DrawerTitle className="sr-only">Menu</DrawerTitle>
-        <div className={cn("p-6 md:p-10", className)}>{children}</div>
-      </DrawerContent>
-    </Drawer>
+    <BaseDrawer open={open} onOpenChange={onOpenChange}>
+      <BaseDrawerPortal>
+        <BaseDrawerBackdrop />
+        <BaseDrawerViewport>
+          <BaseDrawerPopup>
+            <BaseDrawerContent className={cn("w-full min-w-lg", className)}>
+              <BaseDrawerTitle className="sr-only">Menu</BaseDrawerTitle>
+              <div className={cn("p-6 md:p-10", className)}>{children}</div>
+            </BaseDrawerContent>
+          </BaseDrawerPopup>
+        </BaseDrawerViewport>
+      </BaseDrawerPortal>
+    </BaseDrawer>
   );
 };
 

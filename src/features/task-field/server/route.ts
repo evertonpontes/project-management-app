@@ -44,6 +44,8 @@ export default app
           rowId: ID.unique(),
           data: {
             ...data,
+            createdBy: user.$id,
+            updatedBy: user.$id,
           },
         });
 
@@ -124,6 +126,7 @@ export default app
           rowId: customTaskFieldId,
           data: {
             ...data,
+            updatedBy: user.$id,
           },
         });
 
