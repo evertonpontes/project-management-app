@@ -1,5 +1,3 @@
-"use client";
-
 import {
   AtIcon,
   CalendarDotsIcon,
@@ -12,7 +10,7 @@ import {
   PhoneIcon,
   TextTIcon,
   UsersIcon,
-} from "@phosphor-icons/react";
+} from "@phosphor-icons/react/ssr";
 import z from "zod";
 
 export const customTaskFieldKindsOptions = [

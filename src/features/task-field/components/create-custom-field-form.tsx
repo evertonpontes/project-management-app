@@ -50,6 +50,9 @@ import { Currency, CurrencySelect } from "@/components/currency-select";
 import { currencies } from "country-data-list";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PhoneSelect } from "@/components/phone-select";
+import { useCreateCustomField } from "../api/use-create-custom-field";
+import { useParams } from "next/navigation";
+import { useCreateCustomFieldModal } from "../hooks/use-create-custom-field-modal";
 
 interface CreateCustomFieldFormProps {
   onCancel: () => void;
@@ -64,14 +67,59 @@ const CreateCustomFieldForm = ({
   step,
   setStep,
 }: CreateCustomFieldFormProps) => {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+
+  const { onClose } = useCreateCustomFieldModal();
+
+  const { mutate, isPending } = useCreateCustomField({ workspaceId });
+
   const contentRef = useRef<HTMLButtonElement>(null);
 
   const kind = form.watch("kind");
 
-  console.log(form.formState.errors);
-
   const onSubmit = (values: z.infer<typeof createCustomTaskFieldSchema>) => {
-    console.log(values);
+    const finalValues: z.infer<typeof createCustomTaskFieldSchema> = {
+      name: values.name,
+      kind: values.kind,
+      visibility: values.visibility,
+    };
+
+    switch (kind) {
+      case "Currency":
+        finalValues.currencySettings = values.currencySettings;
+        break;
+      case "Dropdown":
+        finalValues.dropdownSettings = values.dropdownSettings;
+        break;
+      case "Number":
+        finalValues.numberSettings = values.numberSettings;
+        break;
+      case "People":
+        finalValues.peopleSettings = values.peopleSettings;
+        break;
+      case "Percent":
+        finalValues.percentSettings = values.percentSettings;
+        break;
+      case "Phone":
+        finalValues.phoneSettings = values.phoneSettings;
+        break;
+      default:
+        break;
+    }
+
+    mutate(
+      {
+        json: finalValues,
+        query: {
+          workspaceId,
+        },
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
   };
 
   const onNextStep = () => {
@@ -94,7 +142,7 @@ const CreateCustomFieldForm = ({
     }
   }, [step]);
 
-  const KindFieldSettings = () => {
+  const AdditionalSettings = () => {
     switch (kind) {
       case "Currency":
         return <CurrencySettingsForm form={form} />;
@@ -139,6 +187,7 @@ const CreateCustomFieldForm = ({
                             field.onChange(kind.value);
                             onNextStep();
                           }}
+                          disabled={isPending}
                         >
                           <kind.icon />
                           {kind.value}
@@ -151,10 +200,19 @@ const CreateCustomFieldForm = ({
             </div>
 
             <Field orientation="horizontal" className="justify-end">
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isPending}
+              >
                 Cancel
               </Button>
-              <Button type="button" onClick={onNextStep} disabled={!kind}>
+              <Button
+                type="button"
+                onClick={onNextStep}
+                disabled={!kind || isPending}
+              >
                 Continue
               </Button>
             </Field>
@@ -196,25 +254,34 @@ const CreateCustomFieldForm = ({
               <Controller
                 name="name"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState: { invalid, error } }) => (
                   <Field>
                     <FieldLabel htmlFor="name">Name</FieldLabel>
                     <Input
                       id="name"
                       placeholder="Enter field name"
                       {...field}
+                      aria-invalid={invalid}
                     />
+                    {invalid && <FieldError errors={[error]} />}
                   </Field>
                 )}
               />
 
-              <KindFieldSettings />
+              <AdditionalSettings />
             </div>
             <Field orientation="horizontal" className="justify-end">
-              <Button type="button" variant="outline" onClick={onBackStep}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onBackStep}
+                disabled={isPending}
+              >
                 Back
               </Button>
-              <Button type="submit">Create Custom Field</Button>
+              <Button type="submit" disabled={isPending}>
+                Create Custom Field
+              </Button>
             </Field>
           </FieldGroup>
         </FieldSet>
@@ -365,7 +432,7 @@ const DropdownSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
           key={option.id}
           name={`dropdownSettings.options.${index}.value`}
           control={form.control}
-          render={({ field }) => (
+          render={({ field, fieldState: { invalid, error } }) => (
             <Field orientation="horizontal">
               <Input
                 placeholder="Option value"
@@ -374,6 +441,7 @@ const DropdownSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
                   field.onBlur();
                   update(index, { ...option, value: e.target.value });
                 }}
+                aria-invalid={invalid}
               />
               <Button
                 type="button"
@@ -383,6 +451,7 @@ const DropdownSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
               >
                 <XIcon />
               </Button>
+              {invalid && <FieldError errors={[error]} />}
             </Field>
           )}
         />
@@ -536,7 +605,7 @@ const NumberSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
             <Select
               items={displayFloatPlaces}
               id="displayFloatDecimalPlacesFormat"
-              defaultValue={0}
+              value={field.value ?? 2}
               onValueChange={field.onChange}
             >
               <SelectTrigger>

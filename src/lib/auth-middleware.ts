@@ -31,7 +31,7 @@ const authMiddleware = createMiddleware<ResponseType>(async (c, next) => {
 
     await next();
   } catch (error) {
-    c.json("Unauthorized", 401);
+    return c.json("Unauthorized", 401);
   }
 });
 
