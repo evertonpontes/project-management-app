@@ -1,3 +1,4 @@
+import { Icon } from "@phosphor-icons/react";
 import {
   AtIcon,
   CalendarDotsIcon,
@@ -26,6 +27,20 @@ export const customTaskFieldKindsOptions = [
   { value: "Phone", icon: PhoneIcon },
   { value: "URL", icon: LinkIcon },
 ];
+
+export const customTaskFieldIcons: Record<string, Icon> = {
+  Text: TextTIcon,
+  Date: CalendarDotsIcon,
+  People: UsersIcon,
+  Number: HashIcon,
+  Percent: PercentIcon,
+  Currency: CurrencyDollarSimpleIcon,
+  Checkbox: CheckSquareIcon,
+  Dropdown: CaretCircleDownIcon,
+  Email: AtIcon,
+  Phone: PhoneIcon,
+  URL: LinkIcon,
+};
 
 export const customTaskFieldKinds = [
   "Text",

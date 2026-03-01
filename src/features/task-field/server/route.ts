@@ -1,4 +1,4 @@
-import { ID, Query } from "node-appwrite";
+import { ID, Models, Query } from "node-appwrite";
 import z from "zod";
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
@@ -8,6 +8,7 @@ import { getMember } from "@/features/member/queries/get-member";
 import { RoleEnum } from "@/features/member/types";
 import {
   createCustomTaskFieldSchema,
+  CustomTaskFieldKinds,
   updateCustomTaskFieldSchema,
 } from "../schemas";
 
@@ -79,6 +80,7 @@ export default app
             ...finalValues,
             createdBy: user.$id,
             updatedBy: user.$id,
+            workspaceId,
           },
         });
 
@@ -112,7 +114,9 @@ export default app
           return c.json({ error: "Unauthorized" }, 401);
         }
 
-        const customTaskField = await tablesDB.listRows({
+        const customTaskField = await tablesDB.listRows<
+          Models.Row & { name: string; kind: string; [key: string]: string }
+        >({
           databaseId: APPWRITE_DATABASE_ID,
           tableId: "custom-task-fields",
           queries: [Query.equal("workspaceId", workspaceId)],
