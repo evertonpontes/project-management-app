@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { currencies as AllCurrencies } from "country-data-list";
 
 import {
   Field,
@@ -297,13 +298,12 @@ interface AdditionalSettingsFormProps {
 }
 
 const CurrencySettingsForm = ({ form }: AdditionalSettingsFormProps) => {
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>({
-    code: "USD",
-    decimals: 2,
-    name: "United States dollar",
-    number: "840",
-    symbol: "$",
-  });
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(
+    AllCurrencies.all.find(
+      (currency) =>
+        currency.code === form.getValues("currencySettings.defaultCurrency"),
+    ) ?? null,
+  );
 
   const handleSelectedCurrency = (currency: Currency) => {
     setSelectedCurrency(currency);
@@ -425,8 +425,11 @@ const DropdownSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
   });
 
   const items = useMemo(
-    () => [...fields.map((field) => ({ label: field.value, value: field.id }))],
-    [fields],
+    () =>
+      form
+        .getValues("dropdownSettings.options")
+        ?.map((field) => ({ label: field.value, value: field.id }))!,
+    [form],
   );
 
   return (

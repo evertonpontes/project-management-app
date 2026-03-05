@@ -74,11 +74,7 @@ const EditCustomFieldForm = ({
 
   const kind = form.watch("kind");
 
-  console.log(form.getValues());
-
   const onSubmit = (values: z.infer<typeof createCustomTaskFieldSchema>) => {
-    console.log("Testing...");
-
     const finalValues: z.infer<typeof createCustomTaskFieldSchema> = {
       name: values.name,
       kind: values.kind,
@@ -355,7 +351,7 @@ const DropdownSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
       form
         .getValues("dropdownSettings.options")
         ?.map((field) => ({ label: field.value, value: field.id }))!,
-    [fields],
+    [form],
   );
 
   return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { JSX } from "react";
 import { Models } from "node-appwrite";
 import { customTaskFieldIcons, updateCustomTaskFieldSchema } from "../schemas";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useEditCustomFieldModal } from "../hooks/use-edit-custom-field-modal";
 import z from "zod";
+import { useDeleteCustomField } from "../api/use-delete-custom-field";
 
 interface CustomFieldItemProps {
   field: Models.Row & {
@@ -28,11 +30,19 @@ interface CustomFieldItemProps {
   };
 
   useEditModal: ReturnType<typeof useEditCustomFieldModal>;
+
+  onDelete: () => Promise<unknown>;
 }
 
-const CustomFieldItem = ({ field, useEditModal }: CustomFieldItemProps) => {
+const CustomFieldItem = ({
+  field,
+  useEditModal,
+  onDelete,
+}: CustomFieldItemProps) => {
   const Icon = customTaskFieldIcons[field.kind];
-  const { onOpen, setInitialValues, initialValues } = useEditModal;
+  const { onOpen, setInitialValues } = useEditModal;
+
+  const { mutate } = useDeleteCustomField();
 
   const handleUpdateCustomField = () => {
     const finalValues: z.infer<typeof updateCustomTaskFieldSchema> = {
@@ -67,6 +77,14 @@ const CustomFieldItem = ({ field, useEditModal }: CustomFieldItemProps) => {
     onOpen();
   };
 
+  const handleDelete = async () => {
+    const ok = await onDelete();
+
+    if (!ok) return;
+
+    mutate({ param: { customTaskFieldId: field.$id } });
+  };
+
   return (
     <div className="flex group items-center gap-4 justify-between w-full p-2 hover:bg-primary/10 rounded-md transition-all">
       <div className="flex items-center gap-2">
@@ -94,9 +112,9 @@ const CustomFieldItem = ({ field, useEditModal }: CustomFieldItemProps) => {
                 Edit custom field
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete}>
                 <TrashIcon className="size-6 md:size-5 text-destructive" />
-                Edit custom field
+                Delete custom field
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

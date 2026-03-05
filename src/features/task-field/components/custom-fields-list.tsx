@@ -11,6 +11,7 @@ import CustomFieldItem from "./custom-field-item";
 import { EditCustomFieldModal } from "./edit-custom-field-modal";
 import { useEditCustomFieldModal } from "../hooks/use-edit-custom-field-modal";
 import { CreateCustomFieldModal } from "./create-custom-field-modal";
+import { useConfirm } from "@/hooks/use-confirm";
 
 const CustomFieldsList = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
@@ -20,8 +21,15 @@ const CustomFieldsList = () => {
 
   const useEditModal = useEditCustomFieldModal();
 
+  const [DeleteDialog, confirmDelete] = useConfirm(
+    "Are you absolutely sure?",
+    "This action cannot be undone. This will permanently delete this custom task field from our servers.",
+    "destructive",
+  );
+
   return (
     <>
+      <DeleteDialog />
       <CreateCustomFieldModal />
       <EditCustomFieldModal useEditModal={useEditModal} />
       <Card>
@@ -35,7 +43,11 @@ const CustomFieldsList = () => {
           <div className="flex flex-col gap-2 w-full max-w-md">
             {customFieldItems?.data.rows.map((field) => (
               <Fragment key={field.$id}>
-                <CustomFieldItem field={field} useEditModal={useEditModal} />
+                <CustomFieldItem
+                  field={field}
+                  useEditModal={useEditModal}
+                  onDelete={confirmDelete}
+                />
               </Fragment>
             ))}
           </div>
