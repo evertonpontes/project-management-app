@@ -115,7 +115,12 @@ export default app
         }
 
         const customTaskField = await tablesDB.listRows<
-          Models.Row & { name: string; kind: string; [key: string]: string }
+          Models.Row & {
+            name: string;
+            kind: string;
+            visibility: "HIDDEN" | "VISIBLE";
+            [key: string]: string;
+          }
         >({
           databaseId: APPWRITE_DATABASE_ID,
           tableId: "custom-task-fields",
@@ -157,12 +162,45 @@ export default app
           return c.json({ error: "Unauthorized" }, 401);
         }
 
+        const finalValues: any = {
+          name: data.name,
+          kind: data.kind,
+          visibility: data.visibility,
+        };
+
+        switch (data.kind) {
+          case "Currency":
+            finalValues.currencySettings = JSON.stringify(
+              data.currencySettings,
+            );
+            break;
+          case "Dropdown":
+            finalValues.dropdownSettings = JSON.stringify(
+              data.dropdownSettings,
+            );
+            break;
+          case "Number":
+            finalValues.numberSettings = JSON.stringify(data.numberSettings);
+            break;
+          case "People":
+            finalValues.peopleSettings = JSON.stringify(data.peopleSettings);
+            break;
+          case "Percent":
+            finalValues.percentSettings = JSON.stringify(data.percentSettings);
+            break;
+          case "Phone":
+            finalValues.phoneSettings = JSON.stringify(data.phoneSettings);
+            break;
+          default:
+            break;
+        }
+
         const customTaskField = await tablesDB.updateRow({
           databaseId: APPWRITE_DATABASE_ID,
           tableId: "custom-task-fields",
           rowId: customTaskFieldId,
           data: {
-            ...data,
+            ...finalValues,
             updatedBy: user.$id,
           },
         });

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { currencies as AllCurrencies } from "country-data-list";
 
 import {
   Field,
@@ -50,34 +51,34 @@ import { Currency, CurrencySelect } from "@/components/currency-select";
 import { currencies } from "country-data-list";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PhoneSelect } from "@/components/phone-select";
-import { useCreateCustomField } from "../api/use-create-custom-field";
 import { useParams } from "next/navigation";
-import { useCreateCustomFieldModal } from "../hooks/use-create-custom-field-modal";
+import { useEditCustomFieldModal } from "../hooks/use-edit-custom-field-modal";
+import { useUpdateCustomField } from "../api/use-update-custom-field";
 
-interface CreateCustomFieldFormProps {
+interface EditCustomFieldFormProps {
   onCancel: () => void;
   form: UseFormReturn<z.infer<typeof createCustomTaskFieldSchema>>;
-  step: number;
-  setStep: (step: number) => void;
+  customFieldId: string;
 }
 
-const CreateCustomFieldForm = ({
+const EditCustomFieldForm = ({
   onCancel,
   form,
-  step,
-  setStep,
-}: CreateCustomFieldFormProps) => {
-  const { workspaceId } = useParams<{ workspaceId: string }>();
+  customFieldId,
+}: EditCustomFieldFormProps) => {
+  const { onClose } = useEditCustomFieldModal();
 
-  const { onClose } = useCreateCustomFieldModal();
-
-  const { mutate, isPending } = useCreateCustomField({ workspaceId });
+  const { mutate, isPending } = useUpdateCustomField();
 
   const contentRef = useRef<HTMLButtonElement>(null);
 
   const kind = form.watch("kind");
 
+  console.log(form.getValues());
+
   const onSubmit = (values: z.infer<typeof createCustomTaskFieldSchema>) => {
+    console.log("Testing...");
+
     const finalValues: z.infer<typeof createCustomTaskFieldSchema> = {
       name: values.name,
       kind: values.kind,
@@ -110,8 +111,8 @@ const CreateCustomFieldForm = ({
     mutate(
       {
         json: finalValues,
-        query: {
-          workspaceId,
+        param: {
+          customTaskFieldId: customFieldId,
         },
       },
       {
@@ -121,26 +122,6 @@ const CreateCustomFieldForm = ({
       },
     );
   };
-
-  const onNextStep = () => {
-    if (step < 1) {
-      setStep(step + 1);
-    }
-  };
-
-  const onBackStep = () => {
-    if (step > 0) {
-      setStep(step - 1);
-    }
-  };
-
-  useEffect(() => {
-    if (step === 1) {
-      if (contentRef.current) {
-        contentRef.current.focus();
-      }
-    }
-  }, [step]);
 
   const AdditionalSettings = () => {
     switch (kind) {
@@ -164,62 +145,7 @@ const CreateCustomFieldForm = ({
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
-        <FieldSet className={cn(step !== 0 && "hidden")}>
-          <FieldLegend>Create custom field</FieldLegend>
-          <FieldGroup>
-            <div className="max-h-[500px] w-full overflow-y-auto flex flex-col gap-4 border-b border-muted-foreground/10 py-4 px-4">
-              {customTaskFieldKindsOptions.map((kind) => (
-                <React.Fragment key={kind.value}>
-                  <Controller
-                    name="kind"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Field>
-                        <Button
-                          variant="ghost"
-                          type="button"
-                          className={cn(
-                            "justify-start",
-                            field.value === kind.value &&
-                              "bg-primary/10 border border-primary text-primary",
-                          )}
-                          onClick={() => {
-                            field.onChange(kind.value);
-                            onNextStep();
-                          }}
-                          disabled={isPending}
-                        >
-                          <kind.icon />
-                          {kind.value}
-                        </Button>
-                      </Field>
-                    )}
-                  />
-                </React.Fragment>
-              ))}
-            </div>
-
-            <Field orientation="horizontal" className="justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={onNextStep}
-                disabled={!kind || isPending}
-              >
-                Continue
-              </Button>
-            </Field>
-          </FieldGroup>
-        </FieldSet>
-
-        <FieldSet className={cn(step !== 1 && "hidden")}>
+        <FieldSet>
           <FieldLegend className="mb-8">Create custom field</FieldLegend>
           <FieldGroup className="w-full lg:max-w-md mx-auto py-0 px-2">
             <div className="h-[500px] w-full overflow-y-auto flex flex-col gap-4 py-4 px-4">
@@ -232,6 +158,7 @@ const CreateCustomFieldForm = ({
                       value={field.value}
                       onValueChange={field.onChange}
                       modal={false}
+                      disabled
                     >
                       <SelectTrigger className="w-full" ref={contentRef}>
                         <SelectValue placeholder="Enter field type" />
@@ -274,13 +201,13 @@ const CreateCustomFieldForm = ({
               <Button
                 type="button"
                 variant="outline"
-                onClick={onBackStep}
+                onClick={onCancel}
                 disabled={isPending}
               >
-                Back
+                Cancel
               </Button>
               <Button type="submit" disabled={isPending}>
-                Create Custom Field
+                Update Custom Field
               </Button>
             </Field>
           </FieldGroup>
@@ -290,20 +217,19 @@ const CreateCustomFieldForm = ({
   );
 };
 
-export { CreateCustomFieldForm };
+export { EditCustomFieldForm };
 
 interface AdditionalSettingsFormProps {
   form: UseFormReturn<z.infer<typeof createCustomTaskFieldSchema>>;
 }
 
 const CurrencySettingsForm = ({ form }: AdditionalSettingsFormProps) => {
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>({
-    code: "USD",
-    decimals: 2,
-    name: "United States dollar",
-    number: "840",
-    symbol: "$",
-  });
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(
+    AllCurrencies.all.find(
+      (currency) =>
+        currency.code === form.getValues("currencySettings.defaultCurrency"),
+    ) ?? null,
+  );
 
   const handleSelectedCurrency = (currency: Currency) => {
     setSelectedCurrency(currency);
@@ -364,7 +290,7 @@ const CurrencySettingsForm = ({ form }: AdditionalSettingsFormProps) => {
             <Select
               items={currencyDisplayFormats}
               id="displayFormat"
-              defaultValue="ISOFormat"
+              value={field.value ?? "ISOFormat"}
               onValueChange={field.onChange}
             >
               <SelectTrigger>
@@ -425,7 +351,10 @@ const DropdownSettingsForm = ({ form }: AdditionalSettingsFormProps) => {
   });
 
   const items = useMemo(
-    () => [...fields.map((field) => ({ label: field.value, value: field.id }))],
+    () =>
+      form
+        .getValues("dropdownSettings.options")
+        ?.map((field) => ({ label: field.value, value: field.id }))!,
     [fields],
   );
 

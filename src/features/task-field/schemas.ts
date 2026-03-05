@@ -68,7 +68,8 @@ const currencySettingsSchema = z
     displayFormat: z.string().default("ISOFormat").optional(), // IsoCodeAfter EuroSymbolAfterWithSpace EuroSymbolAfterNoSpace EuroSymbolBeforeWithSpace EuroSymbolBeforeNoSpace
     displayIntegerDecimalFormat: z.number().default(0).optional(),
   })
-  .optional();
+  .optional()
+  .nullable();
 
 const dropdownSettingsSchema = z
   .object({
@@ -76,33 +77,38 @@ const dropdownSettingsSchema = z
     options: z.array(z.object({ id: z.string(), value: z.string() })),
     defaultValue: z.string().nullable().default(null).optional(),
   })
-  .optional();
+  .optional()
+  .nullable();
 
 const numberSettingsSchema = z
   .object({
     displayIntegerDecimalPlacesFormat: z.number().default(0).optional(),
     displayFloatDecimalPlacesFormat: z.number().default(0).optional(),
   })
-  .optional();
+  .optional()
+  .nullable();
 
 const peopleSettingsSchema = z
   .object({
     allowMultiple: z.boolean().default(false).optional(),
   })
-  .optional();
+  .optional()
+  .nullable();
 
 const percentSettingsSchema = z
   .object({
     displayIntegerDecimalPlacesFormat: z.number().default(0).optional(),
     displayFloatDecimalPlacesFormat: z.number().default(0).optional(),
   })
-  .optional();
+  .optional()
+  .nullable();
 
 const phoneSettingsSchema = z
   .object({
     defaultCountryCode: z.string().default("USA(+1)").optional(),
   })
-  .optional();
+  .optional()
+  .nullable();
 
 const createCustomTaskFieldSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
@@ -119,6 +125,7 @@ const createCustomTaskFieldSchema = z.object({
 const updateCustomTaskFieldSchema = z.object({
   name: z.string().trim().min(1, "Name is required").optional(),
   visibility: z.enum(["HIDDEN", "VISIBLE"]),
+  kind: z.string(),
   currencySettings: currencySettingsSchema,
   dropdownSettings: dropdownSettingsSchema,
   numberSettings: numberSettingsSchema,
