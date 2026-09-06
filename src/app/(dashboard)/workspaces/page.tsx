@@ -1,25 +1,19 @@
+import { getLatestWorkspace } from "@/features/workspace";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function WorkspacesPage() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
+  const workspace = await getLatestWorkspace();
 
-  console.log(data);
+  if (!data) {
+    redirect("/login");
+  }
 
-  return (
-    <div>
-      {data ? (
-        <h1 className="text-foreground text-2xl font-semibold">
-          Welcome back{" "}
-          <b className="text-primary font-extrabold">
-            {data.claims.user_metadata?.full_name}
-          </b>
-        </h1>
-      ) : (
-        <h1 className="text-foreground text-2xl font-semibold">
-          Unauthenticated...
-        </h1>
-      )}
-    </div>
-  );
+  if (workspace) {
+    redirect(`/workspaces/${workspace.id}`);
+  } else {
+    redirect("/workspaces/create");
+  }
 }
