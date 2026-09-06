@@ -13,19 +13,10 @@ export async function getLatestWorkspace() {
 
   const { data: workspaces } = await supabase
     .from("workspaces")
-    .select(
-      `
-    id, 
-    name, 
-    description, 
-    image_url, 
-    created_at, 
-    updated_at, 
-    owner_id
-    `,
-      { count: "exact" },
-    )
+    .select("*", { count: "exact" })
+    .eq("owner_id", auth.claims.sub)
     .order("created_at", { ascending: false })
+    .limit(1)
     .single();
 
   return workspaces;

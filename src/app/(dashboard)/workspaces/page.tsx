@@ -5,11 +5,12 @@ import { redirect } from "next/navigation";
 export default async function WorkspacesPage() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
-  const workspace = await getLatestWorkspace();
 
   if (!data) {
     redirect("/login");
   }
+
+  const workspace = await getLatestWorkspace();
 
   if (workspace) {
     redirect(`/workspaces/${workspace.id}`);
