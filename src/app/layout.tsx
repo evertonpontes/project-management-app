@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { ToastContainer, Bounce } from "react-toastify";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import QueryClientProvider from "@/components/query-client-provider";
@@ -37,8 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <QueryClientProvider>
-          {children}
-
+          <NuqsAdapter>{children}</NuqsAdapter>
           <ToastContainer
             position="bottom-right"
             autoClose={5000}

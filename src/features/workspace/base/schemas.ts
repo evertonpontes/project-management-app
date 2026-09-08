@@ -6,5 +6,22 @@ export const createWorkspaceSchema = z.object({
   image: z
     .union([z.string(), z.instanceof(File)])
     .optional()
-    .transform((value) => (typeof value === "string" && value === "" ? undefined : value)),
+    .transform((value) =>
+      typeof value === "string" && value === "" ? undefined : value,
+    ),
+});
+
+export const updateWorkspaceSchema = z.object({
+  workspaceId: z.uuid("Invalid workspace ID."),
+  name: z
+    .string()
+    .min(3, "Workspace name must be at least 3 characters long.")
+    .optional(),
+  description: z.string().optional(),
+  image: z
+    .union([z.string(), z.instanceof(File)])
+    .optional()
+    .transform((value) =>
+      typeof value === "string" && value === "" ? undefined : value,
+    ),
 });
