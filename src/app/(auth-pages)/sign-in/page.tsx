@@ -1,3 +1,5 @@
-export default function SignUpPage() {
-  return <div>SignIn</div>;
+import { SignInForm } from "@/features/auth";
+
+export default function SignInPage() {
+  return <SignInForm />;
 }
