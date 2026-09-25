@@ -1,0 +1,80 @@
+model Task {
+    id           String       @id @default(uuid())
+    createdById  String?
+    assignedToId String?
+    projectId    String
+    title        String
+    description  String?
+    type         TaskTypes    @default(TASK)
+    status       TaskStatus   @default(TODO)
+    priority     TaskPriority @default(MEDIUM)
+    createdAt    DateTime     @default(now())
+    updatedAt    DateTime     @updatedAt
+    completedAt  DateTime?
+
+    startDate DateTime?
+    dueDate   DateTime?
+
+    createdBy  User?   @relation("UserCreateTask", fields: [createdById], references: [id], onDelete: SetNull)
+    assignedTo User?   @relation("TaskAssignedToUser", fields: [assignedToId], references: [id], onDelete: SetNull)
+    project    Project @relation("ProjectTask", fields: [projectId], references: [id], onDelete: Cascade)
+
+    subTasks Subtask[] @relation("TaskChildren")
+
+    @@index([projectId])
+    @@index([createdById])
+    @@index([assignedToId])
+    @@map("tasks")
+    @@schema("public")
+}
+
+enum TaskTypes {
+    TASK    @map("task")
+    BUG     @map("bug")
+    FEATURE @map("feature")
+    STORY   @map("story")
+    EPIC    @map("epic")
+
+    @@map("task_types")
+    @@schema("public")
+}
+
+enum TaskStatus {
+    TODO        @map("todo")
+    IN_PROGRESS @map("in_progress")
+    IN_REVIEW   @map("in_review")
+    DONE        @map("done")
+
+    @@map("task_statuses")
+    @@schema("public")
+}
+
+enum TaskPriority {
+    LOW      @map("low")
+    MEDIUM   @map("medium")
+    HIGH     @map("high")
+    CRITICAL @map("critical")
+
+    @@map("task_priority_levels")
+    @@schema("public")
+}
+
+model Subtask {
+    id          String    @id @default(uuid())
+    title       String
+    isCompleted Boolean
+    order       Int
+    taskId      String
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    completedAt DateTime?
+
+    startDate DateTime
+    dueDate   DateTime
+
+    task Task @relation("TaskChildren", fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@index([taskId])
+    @@map("subtasks")
+    @@schema("public")
+}
