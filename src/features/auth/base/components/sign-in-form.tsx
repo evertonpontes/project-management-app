@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -58,10 +59,11 @@ export function SignInForm() {
         },
         {
           onSuccess: () => {
-            router.push("/");
+            toast.success("Signed in successfully!");
+            router.push("/workspaces");
           },
           onError: (ctx) => {
-            console.error(ctx.error.message);
+            toast.error(ctx.error.message || "Failed to sign in. Please try again.");
           },
         }
       );
@@ -73,17 +75,17 @@ export function SignInForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full max-w-sm space-y-6"
+      className="space-y-6 mx-auto w-full max-w-sm"
     >
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Login</h1>
-        <p className="text-sm text-muted-foreground">Hi, Welcome back 👋</p>
+        <h1 className="font-bold text-2xl tracking-tight">Login</h1>
+        <p className="text-muted-foreground text-sm">Hi, Welcome back 👋</p>
       </div>
 
       <Button
         type="button"
         variant="outline"
-        className="w-full gap-2"
+        className="gap-2 w-full"
         size="lg"
       >
         <RiGoogleFill className="size-4" />
@@ -135,17 +137,17 @@ export function SignInForm() {
         </Field>
       </FieldSet>
 
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
-            className="size-4 rounded border-input accent-primary"
+            className="border-input rounded size-4 accent-primary"
           />
           Remember Me
         </label>
         <Link
           href="/forgot-password"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="font-medium text-primary text-sm hover:underline underline-offset-4"
         >
           Forgot Password?
         </Link>
@@ -161,11 +163,11 @@ export function SignInForm() {
         {isPending ? "Logging in..." : "Login"}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm text-center">
         Not registered yet?{" "}
         <Link
           href="/sign-up"
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-medium text-primary hover:underline underline-offset-4"
         >
           Create an account ↗
         </Link>

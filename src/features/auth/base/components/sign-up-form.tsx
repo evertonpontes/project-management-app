@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -55,10 +56,11 @@ export function SignUpForm() {
         },
         {
           onSuccess: () => {
-            router.push("/");
+            toast.success("Account created successfully!");
+            router.push("/workspaces");
           },
           onError: (ctx) => {
-            console.error(ctx.error.message);
+            toast.error(ctx.error.message || "Failed to create account. Please try again.");
           },
         }
       );
@@ -70,11 +72,11 @@ export function SignUpForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full max-w-sm space-y-6"
+      className="space-y-6 mx-auto w-full max-w-sm"
     >
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Sign Up</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="font-bold text-2xl tracking-tight">Sign Up</h1>
+        <p className="text-muted-foreground text-sm">
           Create your account to get started 🚀
         </p>
       </div>
@@ -82,7 +84,7 @@ export function SignUpForm() {
       <Button
         type="button"
         variant="outline"
-        className="w-full gap-2"
+        className="gap-2 w-full"
         size="lg"
       >
         <RiGoogleFill className="size-4" />
@@ -157,11 +159,11 @@ export function SignUpForm() {
         {isPending ? "Creating account..." : "Create Account"}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground text-sm text-center">
         Already have an account?{" "}
         <Link
           href="/sign-in"
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-medium text-primary hover:underline underline-offset-4"
         >
           Sign in ↗
         </Link>
