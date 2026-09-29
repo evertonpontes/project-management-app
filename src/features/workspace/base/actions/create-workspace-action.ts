@@ -1,3 +1,5 @@
+"use server"
+
 import { authClient } from "@/lib/safe-action";
 import { createWorkspace } from "../types";
 import { generateKey } from "@/lib/utils";
