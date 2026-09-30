@@ -16,7 +16,9 @@ async function CreateWorkspaceContent() {
     }
 
     return (
-        <CreateWorkspaceForm />
+        <div className="flex flex-col flex-1 justify-center">
+            <CreateWorkspaceForm />
+        </div>
     );
 }
 

@@ -7,3 +7,8 @@ export const createWorkspace = z.object({
 })
 
 export type CreateWorkspaceInput = z.infer<typeof createWorkspace>
+
+export type PaginationInput = {
+    page?: number;
+    rowSize?: number;
+}

@@ -82,7 +82,7 @@ export function CreateWorkspaceForm() {
     return (
         <form
             onSubmit={handleSubmitWithAction}
-            className="space-y-6 w-full"
+            className="space-y-6 mx-auto w-full max-w-xl"
         >
             <div className="space-y-1">
                 <h1 className="font-bold text-2xl tracking-tight">Create Workspace</h1>
