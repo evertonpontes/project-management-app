@@ -19,6 +19,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    useSidebar,
+} from "@/components/ui/sidebar";
 import { useGetWorkspaces, useGetWorkspaceById } from "@/features/workspace";
 
 function getInitials(name?: string | null): string {
@@ -30,6 +36,7 @@ function getInitials(name?: string | null): string {
 
 export function WorkspaceSwitcher() {
     const router = useRouter();
+    const { isMobile } = useSidebar();
     const params = useParams<{ workspaceId: string }>();
     const workspaceId = params.workspaceId;
 
@@ -56,44 +63,58 @@ export function WorkspaceSwitcher() {
     };
 
     return (
+        <SidebarMenu>
+            <SidebarMenuItem>
         <DropdownMenu>
             <DropdownMenuTrigger
-                className="flex items-center gap-2.5 bg-background hover:bg-accent shadow-xs px-3 py-2 border border-input rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full max-w-64 h-10 text-sm transition-colors hover:text-accent-foreground"
-                aria-label="Select workspace"
+                render={
+                    <SidebarMenuButton
+                        size="lg"
+                        className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+                        aria-label="Select workspace"
+                    />
+                }
             >
                 {isLoading ? (
-                    <div className="flex flex-1 items-center gap-2 overflow-hidden text-muted-foreground">
-                        <RiBuilding4Line className="size-4 animate-pulse shrink-0" />
-                        <span className="text-xs truncate">Loading...</span>
-                    </div>
+                    <>
+                        <div className="flex justify-center items-center bg-muted rounded-md size-8 text-muted-foreground shrink-0">
+                            <RiBuilding4Line className="size-4 animate-pulse" />
+                        </div>
+                        <span className="flex-1 text-muted-foreground text-xs truncate">Loading...</span>
+                    </>
                 ) : activeWorkspace ? (
-                    <div className="flex flex-1 items-center gap-2 overflow-hidden text-left">
+                    <>
                         {activeWorkspace.avatarUrl ? (
-                            <Avatar className="rounded-md size-6 shrink-0">
+                            <Avatar className="rounded-md size-8 shrink-0">
                                 <AvatarImage src={activeWorkspace.avatarUrl} alt={activeWorkspace.name} />
-                                <AvatarFallback className="rounded-md font-semibold text-[10px]">
+                                <AvatarFallback className="rounded-md font-semibold text-xs">
                                     {getInitials(activeWorkspace.name)}
                                 </AvatarFallback>
                             </Avatar>
                         ) : (
-                            <div className="flex justify-center items-center bg-primary/10 rounded-md size-6 text-primary shrink-0">
-                                <RiBuilding4Line className="size-3.5" />
+                            <div className="flex justify-center items-center bg-primary/10 rounded-md size-8 text-primary shrink-0">
+                                <RiBuilding4Line className="size-4" />
                             </div>
                         )}
-                        <span className="font-medium truncate">{activeWorkspace.name}</span>
-                    </div>
+                        <span className="flex-1 font-medium truncate">{activeWorkspace.name}</span>
+                    </>
                 ) : (
-                    <div className="flex flex-1 items-center gap-2 overflow-hidden text-muted-foreground text-left">
-                        <div className="flex justify-center items-center bg-muted rounded-md size-6 text-muted-foreground shrink-0">
-                            <RiBuilding4Line className="size-3.5" />
+                    <>
+                        <div className="flex justify-center items-center bg-muted rounded-md size-8 text-muted-foreground shrink-0">
+                            <RiBuilding4Line className="size-4" />
                         </div>
-                        <span className="font-normal text-sm truncate">Select a workspace</span>
-                    </div>
+                        <span className="flex-1 text-muted-foreground truncate">Select a workspace</span>
+                    </>
                 )}
                 <RiExpandUpDownLine className="ml-auto size-4 text-muted-foreground shrink-0" />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" sideOffset={6} className="w-64">
+            <DropdownMenuContent
+                align="start"
+                side={isMobile ? "bottom" : "right"}
+                sideOffset={6}
+                className="min-w-64"
+            >
 
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
@@ -157,5 +178,7 @@ export function WorkspaceSwitcher() {
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
+            </SidebarMenuItem>
+        </SidebarMenu>
     );
 }
