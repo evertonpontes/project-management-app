@@ -108,8 +108,8 @@ export function SettingsWorkspace({
     const inviteUrl = origin && currentKey
         ? `${origin}/workspaces/invite/${currentKey}`
         : currentKey
-        ? `/workspaces/invite/${currentKey}`
-        : "";
+            ? `/workspaces/invite/${currentKey}`
+            : "";
 
     function handleGenerateKey() {
         const newKey = generateKey(10);
@@ -175,7 +175,7 @@ export function SettingsWorkspace({
     }
 
     return (
-        <div className="space-y-8 mx-auto w-full max-w-2xl">
+        <div className="space-y-8 mx-auto py-8 md:py-10 w-full max-w-2xl">
             {/* Page Header */}
             <div className="space-y-1">
                 <h1 className="font-bold text-2xl tracking-tight">Workspace Settings</h1>
@@ -193,7 +193,7 @@ export function SettingsWorkspace({
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleSubmitWithAction}>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 py-8">
                         <FieldSet>
                             {/* Image upload */}
                             <Field>
@@ -337,7 +337,7 @@ export function SettingsWorkspace({
                                 </div>
                                 <FieldDescription className="text-xs break-all">
                                     Invite URL:{" "}
-                                    <span className="font-mono text-foreground font-medium">
+                                    <span className="font-mono font-medium text-foreground">
                                         {inviteUrl || "No key generated yet"}
                                     </span>
                                 </FieldDescription>
@@ -346,7 +346,7 @@ export function SettingsWorkspace({
                         </FieldSet>
                     </CardContent>
 
-                    <CardFooter className="flex justify-end border-t border-border pt-4">
+                    <CardFooter className="flex justify-end pt-4 border-border border-t">
                         <Button
                             type="submit"
                             disabled={isPending || isUploading}
@@ -361,11 +361,11 @@ export function SettingsWorkspace({
             </Card>
 
             {/* Danger Zone Card */}
-            <Card className="border-destructive/30 bg-destructive/[0.02]">
+            <Card className="bg-destructive/[0.02] border-destructive/30">
                 <CardHeader>
                     <div className="flex items-center gap-2">
                         <RiAlertLine className="size-5 text-destructive" />
-                        <CardTitle className="text-destructive font-semibold">
+                        <CardTitle className="font-semibold text-destructive">
                             Danger Zone
                         </CardTitle>
                     </div>
@@ -376,9 +376,9 @@ export function SettingsWorkspace({
 
                 <CardContent className="space-y-4">
                     {/* Transfer / Change Owner Action (Yellow / Amber highlight) */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10">
+                    <div className="flex sm:flex-row flex-col justify-between sm:items-center gap-4 bg-amber-500/5 dark:bg-amber-500/10 p-4 border border-amber-500/30 rounded-lg">
                         <div className="space-y-1">
-                            <h3 className="font-medium text-sm text-amber-900 dark:text-amber-200">
+                            <h3 className="font-medium text-amber-900 dark:text-amber-200 text-sm">
                                 Change Workspace Owner
                             </h3>
                             <p className="text-muted-foreground text-xs">
@@ -388,17 +388,17 @@ export function SettingsWorkspace({
                         <Button
                             type="button"
                             variant="outline"
-                            className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-400/10 shrink-0"
+                            className="hover:bg-amber-500/10 dark:hover:bg-amber-400/10 border-amber-500/40 text-amber-600 hover:text-amber-700 dark:text-amber-400 shrink-0"
                         >
-                            <RiUserSharedLine className="size-4 mr-1.5" />
+                            <RiUserSharedLine className="mr-1.5 size-4" />
                             Change Owner
                         </Button>
                     </div>
 
                     {/* Delete Workspace Action (Red / Destructive highlight) */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-destructive/30 bg-destructive/5 dark:bg-destructive/10">
+                    <div className="flex sm:flex-row flex-col justify-between sm:items-center gap-4 bg-destructive/5 dark:bg-destructive/10 p-4 border border-destructive/30 rounded-lg">
                         <div className="space-y-1">
-                            <h3 className="font-medium text-sm text-destructive">
+                            <h3 className="font-medium text-destructive text-sm">
                                 Delete Workspace
                             </h3>
                             <p className="text-muted-foreground text-xs">
@@ -410,7 +410,7 @@ export function SettingsWorkspace({
                             variant="destructive"
                             className="shrink-0"
                         >
-                            <RiDeleteBinLine className="size-4 mr-1.5" />
+                            <RiDeleteBinLine className="mr-1.5 size-4" />
                             Delete Workspace
                         </Button>
                     </div>
