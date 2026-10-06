@@ -20,7 +20,13 @@ export const createWorkspaceAction = authClient
                 key,
                 avatarUrl,
                 ownerId: auth.user.id,
-            }
+                workspaceMembers: {
+                    create: {
+                        userId: auth.user.id,
+                        role: "ADMIN"
+                    }
+                }
+            },
         })
 
         return {

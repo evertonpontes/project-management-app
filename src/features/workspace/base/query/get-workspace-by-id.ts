@@ -13,10 +13,20 @@ export async function getWorkspaceById(id: string) {
         throw new Error("Unauthorized");
     }
 
+    const isMember = await prisma.workspaceMember.findFirst({
+        where: {
+            userId: session.user.id,
+            workspaceId: id,
+        },
+    });
+
+    if (!isMember) {
+        throw new Error("You are not a member of this workspace");
+    }
+
     const workspace = await prisma.workspace.findUnique({
         where: {
             id,
-            ownerId: session.user.id,
         },
     });
 

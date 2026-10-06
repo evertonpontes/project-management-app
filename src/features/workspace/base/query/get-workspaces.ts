@@ -20,7 +20,11 @@ export async function getWorkspaces({ page = 1, rowSize = 10 }: PaginationInput 
     const [workspaces, total] = await Promise.all([
         prisma.workspace.findMany({
             where: {
-                ownerId: session.user.id,
+                workspaceMembers: {
+                    some: {
+                        userId: session.user.id,
+                    }
+                }
             },
             skip,
             take: rowSize,
@@ -30,7 +34,11 @@ export async function getWorkspaces({ page = 1, rowSize = 10 }: PaginationInput 
         }),
         prisma.workspace.count({
             where: {
-                ownerId: session.user.id,
+                workspaceMembers: {
+                    some: {
+                        userId: session.user.id,
+                    }
+                }
             },
         }),
     ]);
