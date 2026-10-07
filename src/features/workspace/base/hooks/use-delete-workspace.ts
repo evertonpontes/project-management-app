@@ -24,7 +24,7 @@ export function useDeleteWorkspace(
         actionProps: {
             onSuccess: () => {
                 toast.success("Workspace deleted successfully!");
-                queryClient.invalidateQueries({ queryKey: ["workspaces", workspaceId] });
+                queryClient.invalidateQueries({ queryKey: ["workspaces"] });
                 router.refresh();
             },
             onError: ({ error }) => {

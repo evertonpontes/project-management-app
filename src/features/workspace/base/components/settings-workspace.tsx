@@ -35,7 +35,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateKey } from "@/lib/utils";
 
-import { useUpdateWorkspace } from "../hooks";
+import { useDeleteWorkspace, useUpdateWorkspace } from "../hooks";
+import { useConfirm } from "@/hooks";
 
 export interface SettingsWorkspaceProps {
     workspace?: {
@@ -64,6 +65,22 @@ export function SettingsWorkspace({
             key: workspace?.key ?? "",
         }
     );
+
+    const { action: deleteWorkspaceAction } = useDeleteWorkspace(currentWorkspaceId);
+
+    const [DeleteWorkspaceDialog, confirmDeleteWorkspace] = useConfirm(
+        "Delete workspace?",
+        "This action cannot be undone. All projects, tasks, and data in this workspace will be permanently removed.",
+        "destructive"
+    )
+
+    const handleDeleteWorkspace = async () => {
+        const ok = await confirmDeleteWorkspace();
+
+        if (!ok) return;
+
+        await deleteWorkspaceAction.executeAsync({ id: currentWorkspaceId });
+    }
 
     const {
         register,
@@ -359,7 +376,6 @@ export function SettingsWorkspace({
                     </CardFooter>
                 </form>
             </Card>
-
             {/* Danger Zone Card */}
             <Card className="bg-destructive/[0.02] border-destructive/30">
                 <CardHeader>
@@ -409,6 +425,7 @@ export function SettingsWorkspace({
                             type="button"
                             variant="destructive"
                             className="shrink-0"
+                            onClick={handleDeleteWorkspace}
                         >
                             <RiDeleteBinLine className="mr-1.5 size-4" />
                             Delete Workspace
@@ -416,6 +433,8 @@ export function SettingsWorkspace({
                     </div>
                 </CardContent>
             </Card>
+
+            <DeleteWorkspaceDialog />
         </div>
     );
 }
