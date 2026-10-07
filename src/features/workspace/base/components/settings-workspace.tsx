@@ -32,10 +32,16 @@ import {
     FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupText,
+    InputGroupTextarea,
+} from "@/components/ui/input-group";
 import { generateKey } from "@/lib/utils";
 
 import { useDeleteWorkspace, useUpdateWorkspace } from "../hooks";
+import { MAX_WORKSPACE_DESCRIPTION_LENGTH } from "../types";
 import { useConfirm } from "@/hooks";
 
 export interface SettingsWorkspaceProps {
@@ -102,6 +108,7 @@ export function SettingsWorkspace({
     const [hasCopied, setHasCopied] = useState(false);
 
     const currentKey = watch("key") || "";
+    const currentDescription = watch("description") || "";
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -299,13 +306,22 @@ export function SettingsWorkspace({
                                 <FieldLabel htmlFor="workspace-description">
                                     Description
                                 </FieldLabel>
-                                <Textarea
-                                    id="workspace-description"
-                                    placeholder="What's this workspace about?"
-                                    disabled={isPending}
-                                    aria-invalid={!!errors.description}
-                                    {...register("description")}
-                                />
+                                <InputGroup data-disabled={isPending}>
+                                    <InputGroupTextarea
+                                        id="workspace-description"
+                                        placeholder="What's this workspace about?"
+                                        disabled={isPending}
+                                        aria-invalid={!!errors.description}
+                                        maxLength={MAX_WORKSPACE_DESCRIPTION_LENGTH}
+                                        {...register("description")}
+                                        className="w-full max-w-155.5 whitespace-pre-wrap"
+                                    />
+                                    <InputGroupAddon align="block-end">
+                                        <InputGroupText className="ml-auto tabular-nums text-muted-foreground text-xs">
+                                            {currentDescription.length} / {MAX_WORKSPACE_DESCRIPTION_LENGTH}
+                                        </InputGroupText>
+                                    </InputGroupAddon>
+                                </InputGroup>
                                 <FieldError>{errors.description?.message}</FieldError>
                             </Field>
 
