@@ -24,7 +24,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { WorkspaceMemberItem } from "../types";
-import { useUpdateWorkspaceMember } from "../hooks";
+import { useUpdateWorkspaceMember, useDeleteWorkspaceMember } from "../hooks";
 import { RoleTypes } from "@/generated/prisma/enums";
 
 const ROLE_OPTIONS = [
@@ -67,16 +67,21 @@ export function WorkspaceMemberActions({
         }
     };
 
-    const { action } = useUpdateWorkspaceMember({
+    const { action: updateRoleAction } = useUpdateWorkspaceMember({
         userId: member.userId,
         workspaceId: member.workspaceId,
         role: member.role as RoleTypes,
     });
 
-    const handleUpdateRole = async (newRole: RoleTypes) => {
-        if (newRole === member.role || action.isPending) return;
+    const { action: deleteMemberAction } = useDeleteWorkspaceMember({
+        userId: member.userId,
+        workspaceId: member.workspaceId,
+    });
 
-        const result = await action.executeAsync({
+    const handleUpdateRole = async (newRole: RoleTypes) => {
+        if (newRole === member.role || updateRoleAction.isPending || deleteMemberAction.isPending) return;
+
+        const result = await updateRoleAction.executeAsync({
             userId: member.userId,
             workspaceId: member.workspaceId,
             role: newRole,
@@ -84,6 +89,19 @@ export function WorkspaceMemberActions({
 
         if (!result?.serverError && !result?.validationErrors) {
             onRoleChange?.(member, newRole);
+        }
+    };
+
+    const handleRemoveMember = async () => {
+        if (deleteMemberAction.isPending || updateRoleAction.isPending) return;
+
+        const result = await deleteMemberAction.executeAsync({
+            userId: member.userId,
+            workspaceId: member.workspaceId,
+        });
+
+        if (!result?.serverError && !result?.validationErrors) {
+            onRemoveMember?.(member);
         }
     };
 
@@ -128,17 +146,19 @@ export function WorkspaceMemberActions({
                                 <DropdownMenuSubTrigger
                                     disabled={
                                         member.role?.toUpperCase() ===
-                                            RoleTypes.ADMIN || action.isPending
+                                            RoleTypes.ADMIN ||
+                                        updateRoleAction.isPending ||
+                                        deleteMemberAction.isPending
                                     }
                                     className="cursor-pointer"
                                 >
-                                    {action.isPending ? (
+                                    {updateRoleAction.isPending ? (
                                         <RiLoaderLine className="size-4 animate-spin text-muted-foreground" />
                                     ) : (
                                         <RiShieldUserLine className="size-4" />
                                     )}
                                     <span>
-                                        {action.isPending
+                                        {updateRoleAction.isPending
                                             ? "Updating role..."
                                             : "Change role"}
                                     </span>
@@ -158,7 +178,8 @@ export function WorkspaceMemberActions({
                                                 }
                                                 disabled={
                                                     isCurrentRole ||
-                                                    action.isPending
+                                                    updateRoleAction.isPending ||
+                                                    deleteMemberAction.isPending
                                                 }
                                                 className="cursor-pointer flex items-center justify-between"
                                             >
@@ -175,17 +196,29 @@ export function WorkspaceMemberActions({
                     </>
                 )}
 
-                {!isCurrentUser && onRemoveMember && (
+                {!isCurrentUser && (
                     <>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem
                                 variant="destructive"
-                                onClick={() => onRemoveMember(member)}
+                                onClick={handleRemoveMember}
+                                disabled={
+                                    deleteMemberAction.isPending ||
+                                    updateRoleAction.isPending
+                                }
                                 className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer"
                             >
-                                <RiUserUnfollowLine className="size-4" />
-                                <span>Remove member</span>
+                                {deleteMemberAction.isPending ? (
+                                    <RiLoaderLine className="size-4 animate-spin" />
+                                ) : (
+                                    <RiUserUnfollowLine className="size-4" />
+                                )}
+                                <span>
+                                    {deleteMemberAction.isPending
+                                        ? "Removing member..."
+                                        : "Remove member"}
+                                </span>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                     </>
