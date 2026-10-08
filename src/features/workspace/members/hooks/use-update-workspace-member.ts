@@ -6,34 +6,31 @@ import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hoo
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 
-import { createWorkspaceMemberAction } from "../actions";
-import { createWorkspaceMember } from "../types";
+import { updateWorkspaceMemberAction } from "../actions";
+import { updateWorkspaceMember, UpdateWorkspaceMemberInput } from "../types";
 
-export function useCreateWorkspaceMember(
-    workspaceId: string,
+export function useUpdateWorkspaceMember(
+    initialValues: UpdateWorkspaceMemberInput,
     onSuccessCallback?: () => void
 ) {
     const router = useRouter();
     const queryClient = useQueryClient();
 
     return useHookFormAction(
-        createWorkspaceMemberAction,
-        zodResolver(createWorkspaceMember),
+        updateWorkspaceMemberAction,
+        zodResolver(updateWorkspaceMember),
         {
             formProps: {
-                defaultValues: {
-                    userEmail: "",
-                    workspaceId,
-                    role: "MEMBER",
-                },
+                defaultValues: initialValues,
             },
             actionProps: {
                 onSuccess: () => {
-                    toast.success(
-                        "New member added to workspace successfully!"
-                    );
+                    toast.success("Member updated successfully!");
                     queryClient.invalidateQueries({
-                        queryKey: ["workspace-members", workspaceId],
+                        queryKey: [
+                            "workspace-members",
+                            initialValues.workspaceId,
+                        ],
                     });
                     router.refresh();
                     onSuccessCallback?.();
@@ -41,7 +38,7 @@ export function useCreateWorkspaceMember(
                 onError: ({ error }) => {
                     toast.error(
                         error.serverError?.message ||
-                            "Failed to add member to workspace. Please try again."
+                            "Failed to update member role. Please try again."
                     );
                 },
             },

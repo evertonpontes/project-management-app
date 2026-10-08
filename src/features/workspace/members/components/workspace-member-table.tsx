@@ -81,7 +81,11 @@ export function WorkspaceMemberTable({
             const email = (member.user?.email || "").toLowerCase();
             const role = (member.role || "").toLowerCase();
 
-            return name.includes(search) || email.includes(search) || role.includes(search);
+            return (
+                name.includes(search) ||
+                email.includes(search) ||
+                role.includes(search)
+            );
         },
     });
 
@@ -99,7 +103,7 @@ export function WorkspaceMemberTable({
             />
 
             {/* Table Container */}
-            <div className="rounded-md border border-border bg-card">
+            <div className="bg-card border border-border rounded-md">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -109,7 +113,8 @@ export function WorkspaceMemberTable({
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef.header,
+                                                  header.column.columnDef
+                                                      .header,
                                                   header.getContext()
                                               )}
                                     </TableHead>
@@ -125,21 +130,21 @@ export function WorkspaceMemberTable({
                                 <TableRow key={`skeleton-${index}`}>
                                     <TableCell>
                                         <div className="flex items-center gap-3">
-                                            <Skeleton className="size-8 rounded-full" />
+                                            <Skeleton className="rounded-full size-8" />
                                             <div className="space-y-1.5">
-                                                <Skeleton className="h-4 w-28" />
-                                                <Skeleton className="h-3 w-40" />
+                                                <Skeleton className="w-28 h-4" />
+                                                <Skeleton className="w-40 h-3" />
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Skeleton className="h-5 w-16 rounded-full" />
+                                        <Skeleton className="rounded-full w-16 h-5" />
                                     </TableCell>
                                     <TableCell>
-                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="w-24 h-4" />
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Skeleton className="ml-auto size-7 rounded-md" />
+                                        <Skeleton className="ml-auto rounded-md size-7" />
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -148,7 +153,9 @@ export function WorkspaceMemberTable({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
+                                    data-state={
+                                        row.getIsSelected() && "selected"
+                                    }
                                     className="hover:bg-muted/50"
                                 >
                                     {row.getVisibleCells().map((cell) => (
@@ -168,12 +175,14 @@ export function WorkspaceMemberTable({
                                     colSpan={columns.length}
                                     className="h-48 text-center"
                                 >
-                                    <div className="flex flex-col items-center justify-center gap-2 py-6 text-muted-foreground">
-                                        <RiTeamLine className="size-10 stroke-1 text-muted-foreground/60" />
-                                        <div className="text-sm font-medium text-foreground">
-                                            {globalFilter ? "No matching members found" : "No members found"}
+                                    <div className="flex flex-col justify-center items-center gap-2 py-6 text-muted-foreground">
+                                        <RiTeamLine className="stroke-1 size-10 text-muted-foreground/60" />
+                                        <div className="font-medium text-foreground text-sm">
+                                            {globalFilter
+                                                ? "No matching members found"
+                                                : "No members found"}
                                         </div>
-                                        <p className="text-xs text-muted-foreground max-w-sm">
+                                        <p className="max-w-sm text-muted-foreground text-xs">
                                             {globalFilter
                                                 ? `No results for "${globalFilter}". Try adjusting your search query.`
                                                 : "There are no members in this workspace yet. Click the invite button above to invite collaborators."}

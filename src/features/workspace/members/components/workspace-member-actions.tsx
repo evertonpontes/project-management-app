@@ -6,6 +6,8 @@ import {
     RiUserLine,
     RiShieldUserLine,
     RiUserUnfollowLine,
+    RiCheckLine,
+    RiLoaderLine,
 } from "@remixicon/react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
@@ -16,9 +18,21 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { WorkspaceMemberItem } from "../types";
+import { useUpdateWorkspaceMember } from "../hooks";
+import { RoleTypes } from "@/generated/prisma/enums";
+
+const ROLE_OPTIONS = [
+    { label: "Admin", value: RoleTypes.ADMIN },
+    { label: "Project Manager", value: RoleTypes.PROJECT_MANAGER },
+    { label: "Member", value: RoleTypes.MEMBER },
+    { label: "Viewer", value: RoleTypes.VIEWER },
+] as const;
 
 export interface WorkspaceMemberActionsProps {
     member: WorkspaceMemberItem;
@@ -50,6 +64,26 @@ export function WorkspaceMemberActions({
             toast.success("User ID copied to clipboard!");
         } catch {
             toast.error("Failed to copy user ID.");
+        }
+    };
+
+    const { action } = useUpdateWorkspaceMember({
+        userId: member.userId,
+        workspaceId: member.workspaceId,
+        role: member.role as RoleTypes,
+    });
+
+    const handleUpdateRole = async (newRole: RoleTypes) => {
+        if (newRole === member.role || action.isPending) return;
+
+        const result = await action.executeAsync({
+            userId: member.userId,
+            workspaceId: member.workspaceId,
+            role: newRole,
+        });
+
+        if (!result?.serverError && !result?.validationErrors) {
+            onRoleChange?.(member, newRole);
         }
     };
 
@@ -86,18 +120,57 @@ export function WorkspaceMemberActions({
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 
-                {onRoleChange && (
+                {!isCurrentUser && (
                     <>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem
-                                onClick={() => onRoleChange(member, "ADMIN")}
-                                disabled={member.role === "ADMIN"}
-                                className="cursor-pointer"
-                            >
-                                <RiShieldUserLine className="size-4" />
-                                <span>Change role</span>
-                            </DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger
+                                    disabled={
+                                        member.role?.toUpperCase() ===
+                                            RoleTypes.ADMIN || action.isPending
+                                    }
+                                    className="cursor-pointer"
+                                >
+                                    {action.isPending ? (
+                                        <RiLoaderLine className="size-4 animate-spin text-muted-foreground" />
+                                    ) : (
+                                        <RiShieldUserLine className="size-4" />
+                                    )}
+                                    <span>
+                                        {action.isPending
+                                            ? "Updating role..."
+                                            : "Change role"}
+                                    </span>
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent className="w-44">
+                                    {ROLE_OPTIONS.map((option) => {
+                                        const isCurrentRole =
+                                            member.role?.toUpperCase() ===
+                                            option.value;
+                                        return (
+                                            <DropdownMenuItem
+                                                key={option.value}
+                                                onClick={() =>
+                                                    handleUpdateRole(
+                                                        option.value
+                                                    )
+                                                }
+                                                disabled={
+                                                    isCurrentRole ||
+                                                    action.isPending
+                                                }
+                                                className="cursor-pointer flex items-center justify-between"
+                                            >
+                                                <span>{option.label}</span>
+                                                {isCurrentRole && (
+                                                    <RiCheckLine className="size-4 text-primary" />
+                                                )}
+                                            </DropdownMenuItem>
+                                        );
+                                    })}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
                         </DropdownMenuGroup>
                     </>
                 )}
