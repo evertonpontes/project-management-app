@@ -51,19 +51,27 @@ export type ProjectOwner = {
     image?: string | null;
 };
 
-export type ProjectMemberItem = {
+import type { ProjectMemberItem } from "../members/types";
+
+export type ProjectWorkspace = {
     id: string;
-    userId: string;
-    projectId: string;
-    role: string;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-    user: ProjectOwner;
+    name: string;
+    avatarUrl?: string | null;
+    ownerId?: string;
+};
+
+export type ProjectTaskItem = {
+    id?: string;
+    title?: string;
+    status: string;
+    priority?: string;
+    dueDate?: Date | string | null;
 };
 
 export type ProjectItem = {
     id: string;
     name: string;
+    description?: string | null;
     ownerId: string;
     workspaceId: string;
     startDate: Date | string;
@@ -72,8 +80,9 @@ export type ProjectItem = {
     updatedAt?: Date | string;
     isDone?: boolean;
     status?: string;
-    tasks?: { status: string }[];
+    tasks?: ProjectTaskItem[];
     owner?: ProjectOwner;
+    workspace?: ProjectWorkspace;
     projectMembers?: ProjectMemberItem[];
     _count?: {
         tasks: number;

@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
     RiCalendarLine,
     RiCheckLine,
@@ -28,37 +30,44 @@ export interface ProjectCardProps {
 const COLOR_PALETTES = [
     {
         iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
-        badgeBg: "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20",
+        badgeBg:
+            "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20",
         accentBar: "bg-blue-500",
     },
     {
         iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
-        badgeBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20",
+        badgeBg:
+            "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20",
         accentBar: "bg-emerald-500",
     },
     {
         iconBg: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30",
-        badgeBg: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20",
+        badgeBg:
+            "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20",
         accentBar: "bg-purple-500",
     },
     {
         iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
-        badgeBg: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
+        badgeBg:
+            "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
         accentBar: "bg-amber-500",
     },
     {
         iconBg: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30",
-        badgeBg: "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20",
+        badgeBg:
+            "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20",
         accentBar: "bg-rose-500",
     },
     {
         iconBg: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30",
-        badgeBg: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20",
+        badgeBg:
+            "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20",
         accentBar: "bg-indigo-500",
     },
     {
         iconBg: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30",
-        badgeBg: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/20",
+        badgeBg:
+            "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/20",
         accentBar: "bg-cyan-500",
     },
 ];
@@ -76,6 +85,7 @@ function formatDate(dateValue?: Date | string | null): string {
 
 export function ProjectCard({
     project,
+    workspaceId = project.workspaceId,
     onUpdate,
     onDelete,
     className = "",
@@ -97,9 +107,7 @@ export function ProjectCard({
         if (
             project.tasks &&
             project.tasks.length > 0 &&
-            project.tasks.every(
-                (t) => t.status?.toUpperCase() === "DONE"
-            )
+            project.tasks.every((t) => t.status?.toUpperCase() === "DONE")
         ) {
             return true;
         }
@@ -141,12 +149,12 @@ export function ProjectCard({
         };
     }, [isDone, project.startDate, project.dueDate]);
 
-    const taskCount = project._count?.tasks ?? (project.tasks?.length ?? 0);
+    const taskCount = project._count?.tasks ?? project.tasks?.length ?? 0;
     const memberCount =
-        project._count?.projectMembers ?? (project.projectMembers?.length ?? 1);
+        project._count?.projectMembers ?? project.projectMembers?.length ?? 1;
     const completedTasks =
-        project.tasks?.filter((t) => t.status?.toUpperCase() === "DONE").length ??
-        0;
+        project.tasks?.filter((t) => t.status?.toUpperCase() === "DONE")
+            .length ?? 0;
 
     const ownerInitials = (project.owner?.name || "U")
         .split(" ")
@@ -155,30 +163,57 @@ export function ProjectCard({
         .join("")
         .toUpperCase();
 
+    const router = useRouter();
+    const projectHref = `/workspaces/${workspaceId}/projects/${project.id}`;
+
+    const handleCardClick = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (
+            target.closest(
+                "button, a, [role='menuitem'], [data-slot='dropdown-trigger']"
+            )
+        ) {
+            return;
+        }
+        router.push(projectHref);
+    };
+
     return (
         <Card
-            className={`group relative overflow-hidden border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-border/80 hover:shadow-md ${className}`}
+            onClick={handleCardClick}
+            className={`group relative overflow-hidden border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-border/80 hover:shadow-md cursor-pointer ${className}`}
         >
-            <div className={`absolute top-0 inset-x-0 h-1 ${palette.accentBar}`} />
+            <div
+                className={`absolute top-0 inset-x-0 h-1 ${palette.accentBar}`}
+            />
 
             <CardHeader className="pt-5 pb-3">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex justify-between items-start gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                        <div
-                            className={`flex size-10 shrink-0 items-center justify-center rounded-lg border ${palette.iconBg}`}
+                        <Link
+                            href={projectHref}
+                            className={`flex size-10 shrink-0 items-center justify-center rounded-lg border ${palette.iconBg} transition-transform group-hover:scale-105`}
                         >
                             <RiFolder3Line className="size-5" />
-                        </div>
+                        </Link>
                         <div className="min-w-0">
                             <h3
-                                className="truncate font-semibold text-base text-foreground tracking-tight group-hover:text-primary transition-colors"
+                                className="font-semibold text-foreground group-hover:text-primary text-base truncate tracking-tight transition-colors"
                                 title={project.name}
                             >
-                                {project.name}
+                                <Link
+                                    href={projectHref}
+                                    className="focus-visible:outline-hidden hover:underline"
+                                >
+                                    {project.name}
+                                </Link>
                             </h3>
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                            <div className="flex items-center gap-1.5 mt-0.5 text-muted-foreground text-xs">
                                 <RiCalendarLine className="size-3.5 shrink-0" />
-                                <span>{formatDate(project.startDate)} – {formatDate(project.dueDate)}</span>
+                                <span>
+                                    {formatDate(project.startDate)} –{" "}
+                                    {formatDate(project.dueDate)}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -186,7 +221,10 @@ export function ProjectCard({
                     <div className="flex items-center gap-1.5 shrink-0">
                         <Badge
                             variant={status.variant}
-                            className={cn("text-[11px] font-medium gap-1", status.className)}
+                            className={cn(
+                                "gap-1 font-medium text-[11px]",
+                                status.className
+                            )}
                         >
                             {isDone && (
                                 <RiCheckLine className="size-3 text-emerald-600 dark:text-emerald-400" />
@@ -209,8 +247,8 @@ export function ProjectCard({
                 </div>
             </CardHeader>
 
-            <CardContent className="pt-2 pb-5 space-y-3">
-                <div className="flex items-center justify-between border-t border-border/50 pt-3 text-xs text-muted-foreground">
+            <CardContent className="space-y-3 pt-2 pb-5">
+                <div className="flex justify-between items-center pt-3 border-border/50 border-t text-muted-foreground text-xs">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1 text-muted-foreground">
                             <RiTaskLine className="size-3.5" />
@@ -226,25 +264,35 @@ export function ProjectCard({
                         <div className="flex items-center gap-1 text-muted-foreground">
                             <RiGroupLine className="size-3.5" />
                             <span>
-                                <strong className="font-medium text-foreground">{memberCount}</strong> {memberCount === 1 ? "member" : "members"}
+                                <strong className="font-medium text-foreground">
+                                    {memberCount}
+                                </strong>{" "}
+                                {memberCount === 1 ? "member" : "members"}
                             </span>
                         </div>
                     </div>
 
                     {project.owner && (
                         <div
-                            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                            className="flex items-center gap-1.5 text-muted-foreground text-xs"
                             title={`Owner: ${project.owner.name}`}
                         >
                             <Avatar className="size-5">
                                 {project.owner.image && (
-                                    <AvatarImage src={project.owner.image} alt={project.owner.name} />
+                                    <AvatarImage
+                                        src={project.owner.image}
+                                        alt={project.owner.name}
+                                    />
                                 )}
                                 <AvatarFallback className="text-[10px]">
-                                    {ownerInitials || <RiUserLine className="size-3" />}
+                                    {ownerInitials || (
+                                        <RiUserLine className="size-3" />
+                                    )}
                                 </AvatarFallback>
                             </Avatar>
-                            <span className="truncate max-w-[90px]">{project.owner.name}</span>
+                            <span className="max-w-[90px] truncate">
+                                {project.owner.name}
+                            </span>
                         </div>
                     )}
                 </div>

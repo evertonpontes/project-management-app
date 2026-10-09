@@ -76,7 +76,7 @@ export function NavProjects() {
                                     tooltip={project.name}
                                     render={
                                         <Link
-                                            href={`/workspaces/${workspaceId}/projects`}
+                                            href={`/workspaces/${workspaceId}/projects/${project.id}`}
                                         />
                                     }
                                 >

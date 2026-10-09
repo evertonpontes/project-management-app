@@ -6,4 +6,5 @@ export * from "./project-create-modal";
 export * from "./project-update-modal";
 export * from "./project-actions";
 export * from "./project-delete-dialog";
+export * from "./project-details-header";
 export * from "./project-panel";
