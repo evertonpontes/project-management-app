@@ -6,6 +6,7 @@ import { RiTaskLine } from "@remixicon/react";
 import { auth } from "@/lib/auth";
 import { getWorkspaceById } from "@/features/workspace";
 import { getProjectById, ProjectDetailsHeader } from "@/features/project";
+import { TaskPanel } from "@/features/task";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -96,28 +97,9 @@ async function ProjectPageContent({ params }: ProjectContentProps) {
         <div className="flex flex-col flex-1 p-6 md:p-8 space-y-6" data-slot="project-page">
             <ProjectDetailsHeader project={project} workspaceId={workspaceId} />
 
-            {/* Project Content Section */}
-            <div className="rounded-xl border border-border/80 bg-card p-6 shadow-2xs space-y-4">
-                <div className="space-y-1">
-                    <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                        Project Tasks & Activities
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                        Manage, assign, and track all tasks, milestones, and deliverables for {project.name}.
-                    </p>
-                </div>
-
-                <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/70 bg-muted/20 py-12 px-4 text-center">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3 shadow-2xs">
-                        <RiTaskLine className="size-6" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground">
-                        Tasks board and view coming soon
-                    </h3>
-                    <p className="mt-1 text-xs text-muted-foreground max-w-sm">
-                        You will be able to create tasks, organize columns, assign team members, and track progress here.
-                    </p>
-                </div>
+            {/* Project Tasks Panel */}
+            <div className="rounded-xl border border-border/80 bg-card p-6 shadow-2xs">
+                <TaskPanel projectId={project.id} projectName={project.name} />
             </div>
         </div>
     );
