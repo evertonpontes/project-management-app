@@ -2,16 +2,19 @@ model Project {
     id        String   @id @default(uuid())
     name      String
     ownerId   String
+    workspaceId String
     startDate DateTime
     dueDate   DateTime
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
     projectMembers ProjectMember[]
     tasks          Task[]          @relation("ProjectTask")
 
     @@index([ownerId])
+    @@index([workspaceId])
     @@map("projects")
     @@schema("public")
 }

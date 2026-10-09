@@ -10,6 +10,7 @@ model Workspace {
 
     owner            User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     workspaceMembers WorkspaceMember[]
+    projects         Project[]
 
     @@unique([key])
     @@index([ownerId])
