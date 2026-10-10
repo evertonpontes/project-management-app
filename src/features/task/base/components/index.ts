@@ -2,6 +2,7 @@ export * from "./task-status-badge";
 export * from "./task-priority-badge";
 export * from "./task-progress-bar";
 export * from "./task-create-drawer";
+export * from "./task-detail-drawer";
 export * from "./task-filters-toolbar";
 export * from "./task-table-view";
 export * from "./task-list-view";

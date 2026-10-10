@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import type { TaskFilters, TaskPaginationInput } from "../types";
+import type { TaskFilters, TaskItem, TaskPaginationInput } from "../types";
 import { useGetTasks } from "../hooks";
 import { TaskCreateDrawer } from "./task-create-drawer";
+import { TaskDetailDrawer } from "./task-detail-drawer";
 import { TaskFiltersToolbar } from "./task-filters-toolbar";
 import { TaskBoardView } from "./task-board-view";
 import { TaskListView } from "./task-list-view";
@@ -26,6 +27,7 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
     const [activeTab, setActiveTab] = useState<string>("board");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [selectedStatusForAdd, setSelectedStatusForAdd] = useState<TaskStatus | undefined>(undefined);
+    const [selectedTaskForDetail, setSelectedTaskForDetail] = useState<TaskItem | null>(null);
 
     const [filters, setFilters] = useState<TaskFilters>({
         status: "ALL",
@@ -113,6 +115,7 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
                             <TaskBoardView
                                 tasks={tasks}
                                 onAddTask={handleOpenCreateDrawer}
+                                onTaskClick={setSelectedTaskForDetail}
                             />
                         </TabsContent>
 
@@ -120,11 +123,15 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
                             <TaskListView
                                 tasks={tasks}
                                 onAddTask={handleOpenCreateDrawer}
+                                onTaskClick={setSelectedTaskForDetail}
                             />
                         </TabsContent>
 
                         <TabsContent value="table" className="mt-0 focus-visible:outline-none">
-                            <TaskTableView tasks={tasks} />
+                            <TaskTableView
+                                tasks={tasks}
+                                onTaskClick={setSelectedTaskForDetail}
+                            />
                         </TabsContent>
                     </>
                 )}
@@ -136,6 +143,17 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
                 open={isCreateOpen}
                 onOpenChange={setIsCreateOpen}
                 initialStatus={selectedStatusForAdd}
+            />
+
+            {/* View / Edit Task Detail Drawer */}
+            <TaskDetailDrawer
+                task={selectedTaskForDetail}
+                open={Boolean(selectedTaskForDetail)}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setSelectedTaskForDetail(null);
+                    }
+                }}
             />
         </div>
     );

@@ -23,12 +23,14 @@ interface TaskBoardViewProps {
     tasks: TaskItem[];
     onAddTask?: (status: TaskStatus) => void;
     onStatusChange?: (taskId: string, newStatus: TaskStatus) => void;
+    onTaskClick?: (task: TaskItem) => void;
 }
 
 export function TaskBoardView({
     tasks: initialTasks,
     onAddTask,
     onStatusChange,
+    onTaskClick,
 }: TaskBoardViewProps) {
     const [draggedOverrides, setDraggedOverrides] = useState<Record<string, TaskStatus>>({});
     const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
@@ -113,6 +115,7 @@ export function TaskBoardView({
                             dotColor={statusOption.color}
                             tasks={columnTasks}
                             onAddTask={onAddTask}
+                            onTaskClick={onTaskClick}
                         />
                     );
                 })}

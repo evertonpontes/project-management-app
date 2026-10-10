@@ -15,6 +15,7 @@ import { TASK_STATUS_OPTIONS } from "../types";
 interface TaskListViewProps {
     tasks: TaskItem[];
     onAddTask?: (status: TaskStatus) => void;
+    onTaskClick?: (task: TaskItem) => void;
 }
 
 const priorityDotColors: Record<string, string> = {
@@ -31,7 +32,11 @@ function formatDate(dateInput?: Date | string | null): string {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function TaskListView({ tasks, onAddTask }: TaskListViewProps) {
+export function TaskListView({
+    tasks,
+    onAddTask,
+    onTaskClick,
+}: TaskListViewProps) {
     if (tasks.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/10 py-16 text-center">
@@ -93,7 +98,8 @@ export function TaskListView({ tasks, onAddTask }: TaskListViewProps) {
                                 {groupTasks.map((task) => (
                                     <div
                                         key={task.id}
-                                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
+                                        onClick={() => onTaskClick?.(task)}
+                                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
                                     >
                                         {/* Left: Dot & Title/Description */}
                                         <div className="flex items-start gap-3 min-w-0 flex-1">

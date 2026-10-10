@@ -62,6 +62,43 @@ export const createTask = z.object({
 
 export type CreateTaskInput = z.infer<typeof createTask>;
 
+export const updateTask = z.object({
+    id: z.string().uuid("Invalid task ID").min(1, "Task ID is required"),
+    projectId: z.string().uuid("Invalid project ID").optional(),
+    title: z.string().min(1, "Title is required").max(255, "Title is too long").optional(),
+    description: z.string().optional().nullable(),
+    type: z
+        .enum([
+            TaskTypes.TASK,
+            TaskTypes.BUG,
+            TaskTypes.FEATURE,
+            TaskTypes.STORY,
+            TaskTypes.EPIC,
+        ] as const)
+        .optional(),
+    status: z
+        .enum([
+            TaskStatus.TODO,
+            TaskStatus.IN_PROGRESS,
+            TaskStatus.IN_REVIEW,
+            TaskStatus.DONE,
+        ] as const)
+        .optional(),
+    priority: z
+        .enum([
+            TaskPriority.LOW,
+            TaskPriority.MEDIUM,
+            TaskPriority.HIGH,
+            TaskPriority.CRITICAL,
+        ] as const)
+        .optional(),
+    startDate: z.coerce.date().optional().nullable(),
+    dueDate: z.coerce.date().optional().nullable(),
+    assignedToId: z.string().optional().nullable(),
+});
+
+export type UpdateTaskInput = z.infer<typeof updateTask>;
+
 export interface TaskFilters {
     status?: TaskStatus | "ALL";
     type?: TaskTypes | "ALL";

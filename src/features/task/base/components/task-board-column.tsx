@@ -17,6 +17,7 @@ interface TaskBoardColumnProps {
     dotColor?: string;
     tasks: TaskItem[];
     onAddTask?: (status: TaskStatus) => void;
+    onTaskClick?: (task: TaskItem) => void;
 }
 
 export function TaskBoardColumn({
@@ -25,6 +26,7 @@ export function TaskBoardColumn({
     dotColor = "bg-slate-400",
     tasks,
     onAddTask,
+    onTaskClick,
 }: TaskBoardColumnProps) {
     const { setNodeRef, isOver } = useDroppable({
         id: status,
@@ -76,7 +78,11 @@ export function TaskBoardColumn({
                     </div>
                 ) : (
                     tasks.map((task) => (
-                        <TaskBoardCard key={task.id} task={task} />
+                        <TaskBoardCard
+                            key={task.id}
+                            task={task}
+                            onTaskClick={onTaskClick}
+                        />
                     ))
                 )}
             </div>

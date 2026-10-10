@@ -21,6 +21,7 @@ import { TaskProgressBar } from "./task-progress-bar";
 
 interface TaskTableViewProps {
     tasks: TaskItem[];
+    onTaskClick?: (task: TaskItem) => void;
 }
 
 function formatDate(dateInput?: Date | string | null): string {
@@ -30,7 +31,7 @@ function formatDate(dateInput?: Date | string | null): string {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function TaskTableView({ tasks }: TaskTableViewProps) {
+export function TaskTableView({ tasks, onTaskClick }: TaskTableViewProps) {
     if (tasks.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/10 py-16 text-center">
@@ -60,7 +61,11 @@ export function TaskTableView({ tasks }: TaskTableViewProps) {
                 </TableHeader>
                 <TableBody>
                     {tasks.map((task) => (
-                        <TableRow key={task.id} className="hover:bg-muted/40 transition-colors">
+                        <TableRow
+                            key={task.id}
+                            onClick={() => onTaskClick?.(task)}
+                            className="hover:bg-muted/40 transition-colors cursor-pointer"
+                        >
                             {/* Task Title & Description */}
                             <TableCell className="py-3.5">
                                 <div className="space-y-0.5">

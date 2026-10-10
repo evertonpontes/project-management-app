@@ -15,6 +15,7 @@ import { TaskProgressBar } from "./task-progress-bar";
 interface TaskBoardCardProps {
     task: TaskItem;
     isOverlay?: boolean;
+    onTaskClick?: (task: TaskItem) => void;
 }
 
 function formatDate(dateInput?: Date | string | null): string {
@@ -24,7 +25,11 @@ function formatDate(dateInput?: Date | string | null): string {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function TaskBoardCard({ task, isOverlay = false }: TaskBoardCardProps) {
+export function TaskBoardCard({
+    task,
+    isOverlay = false,
+    onTaskClick,
+}: TaskBoardCardProps) {
     const {
         attributes,
         listeners,
@@ -46,14 +51,21 @@ export function TaskBoardCard({ task, isOverlay = false }: TaskBoardCardProps) {
         cursor: isOverlay ? "grabbing" : "grab",
     };
 
+    const handleClick = () => {
+        if (!isDragging && onTaskClick) {
+            onTaskClick(task);
+        }
+    };
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...attributes}
             {...listeners}
-            className={`group rounded-xl border border-border/80 bg-card p-4 shadow-2xs hover:shadow-sm hover:border-primary/40 transition-all select-none ${
-                isOverlay ? "shadow-lg rotate-1 ring-2 ring-primary/40" : ""
+            onClick={handleClick}
+            className={`group rounded-xl border border-border/80 bg-card p-4 shadow-2xs hover:shadow-sm hover:border-primary/40 transition-all select-none cursor-pointer ${
+                isOverlay ? "shadow-lg rotate-1 ring-2 ring-primary/40 cursor-grabbing" : ""
             }`}
         >
             {/* Top row: Priority badge */}
