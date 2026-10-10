@@ -1,12 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { useDroppable } from "@dnd-kit/core";
 import { RiAddLine } from "@remixicon/react";
 import { TaskStatus } from "@/generated/prisma/enums";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    KanbanColumn,
+    KanbanColumnContent,
+    KanbanItem,
+    KanbanItemHandle,
+} from "@/components/reui/kanban";
 
 import type { TaskItem } from "../types";
 import { TaskBoardCard } from "./task-board-card";
@@ -28,21 +33,12 @@ export function TaskBoardColumn({
     onAddTask,
     onTaskClick,
 }: TaskBoardColumnProps) {
-    const { setNodeRef, isOver } = useDroppable({
-        id: status,
-        data: {
-            status,
-        },
-    });
-
     return (
-        <div
-            ref={setNodeRef}
-            className={`flex flex-col flex-1 min-w-[280px] max-w-[340px] rounded-xl border border-border/80 bg-muted/20 p-3 transition-colors ${
-                isOver ? "bg-primary/5 border-primary/40 ring-2 ring-primary/20" : ""
-            }`}
+        <KanbanColumn
+            value={status}
+            className="flex flex-col flex-1 min-w-[280px] max-w-[340px] rounded-xl border border-border/80 bg-muted/20 p-3 transition-colors"
         >
-            {/* Column Header */}
+            {/* Column Header - without KanbanColumnHandle so column is not draggable */}
             <div className="flex items-center justify-between px-1 py-1 mb-3">
                 <div className="flex items-center gap-2">
                     <span className={`size-2.5 rounded-full ${dotColor}`} />
@@ -71,22 +67,28 @@ export function TaskBoardColumn({
             </div>
 
             {/* Cards container */}
-            <div className="flex flex-col gap-2.5 flex-1 min-h-32 overflow-y-auto pr-0.5">
+            <KanbanColumnContent
+                value={status}
+                className="flex flex-col gap-2.5 flex-1 min-h-32 overflow-y-auto pr-0.5"
+            >
                 {tasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center flex-1 rounded-lg border border-dashed border-border/60 py-8 text-center text-xs text-muted-foreground">
                         <span>Drop tasks here</span>
                     </div>
                 ) : (
                     tasks.map((task) => (
-                        <TaskBoardCard
-                            key={task.id}
-                            task={task}
-                            onTaskClick={onTaskClick}
-                        />
+                        <KanbanItem key={task.id} value={task.id}>
+                            <KanbanItemHandle>
+                                <TaskBoardCard
+                                    task={task}
+                                    onTaskClick={onTaskClick}
+                                />
+                            </KanbanItemHandle>
+                        </KanbanItem>
                     ))
                 )}
-            </div>
-        </div>
+            </KanbanColumnContent>
+        </KanbanColumn>
     );
 }
 

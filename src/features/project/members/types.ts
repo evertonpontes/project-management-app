@@ -8,23 +8,21 @@ export const PROJECT_ROLE_OPTIONS = [
 ] as const;
 
 export const createProjectMember = z.object({
-    userEmail: z.string().email("Invalid email address").min(1, "Email is required"),
-    projectId: z
-        .string()
-        .uuid("Invalid project ID")
-        .min(1, "Project ID is required"),
+    userEmail: z.email("Invalid email address").min(1, "Email is required"),
+    projectId: z.uuid("Invalid project ID").min(1, "Project ID is required"),
     role: z
         .enum([RoleTypes.ADMIN, RoleTypes.MEMBER, RoleTypes.VIEWER] as const)
         .default(RoleTypes.MEMBER),
 });
 
 export const updateProjectMember = z.object({
-    userId: z.string().min(1, "User ID is required"),
-    projectId: z
-        .string()
-        .uuid("Invalid project ID")
-        .min(1, "Project ID is required"),
-    role: z.enum([RoleTypes.ADMIN, RoleTypes.MEMBER, RoleTypes.VIEWER] as const),
+    userId: z.uuid("Invalid user ID").min(1, "User ID is required"),
+    projectId: z.uuid("Invalid project ID").min(1, "Project ID is required"),
+    role: z.enum([
+        RoleTypes.ADMIN,
+        RoleTypes.MEMBER,
+        RoleTypes.VIEWER,
+    ] as const),
 });
 
 export const deleteProjectMember = z.object({

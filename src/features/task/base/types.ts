@@ -2,8 +2,12 @@ import { TaskPriority, TaskStatus, TaskTypes } from "@/generated/prisma/enums";
 import z from "zod";
 
 export const TASK_STATUS_OPTIONS = [
-    { label: "Backlog", value: TaskStatus.TODO, color: "bg-slate-400" },
-    { label: "In Progress", value: TaskStatus.IN_PROGRESS, color: "bg-amber-500" },
+    { label: "Todo", value: TaskStatus.TODO, color: "bg-slate-400" },
+    {
+        label: "In Progress",
+        value: TaskStatus.IN_PROGRESS,
+        color: "bg-amber-500",
+    },
     { label: "In Review", value: TaskStatus.IN_REVIEW, color: "bg-blue-500" },
     { label: "Done", value: TaskStatus.DONE, color: "bg-emerald-500" },
 ] as const;
@@ -24,10 +28,7 @@ export const TASK_TYPE_OPTIONS = [
 ] as const;
 
 export const createTask = z.object({
-    projectId: z
-        .string()
-        .uuid("Invalid project ID")
-        .min(1, "Project is required"),
+    projectId: z.uuid("Invalid project ID").min(1, "Project is required"),
     title: z.string().min(1, "Title is required").max(255, "Title is too long"),
     description: z.string().optional().nullable(),
     type: z
@@ -55,17 +56,30 @@ export const createTask = z.object({
             TaskPriority.CRITICAL,
         ] as const)
         .default(TaskPriority.MEDIUM),
-    startDate: z.coerce.date().optional().nullable(),
-    dueDate: z.coerce.date().optional().nullable(),
-    assignedToId: z.string().optional().nullable(),
+    startDate: z.preprocess(
+        (arg) => (arg === "" || arg === undefined ? null : arg),
+        z.coerce.date().optional().nullable()
+    ),
+    dueDate: z.preprocess(
+        (arg) => (arg === "" || arg === undefined ? null : arg),
+        z.coerce.date().optional().nullable()
+    ),
+    assignedToId: z.preprocess(
+        (arg) => (arg === "UNASSIGNED" || arg === "" ? null : arg),
+        z.string().optional().nullable()
+    ),
 });
 
 export type CreateTaskInput = z.infer<typeof createTask>;
 
 export const updateTask = z.object({
-    id: z.string().uuid("Invalid task ID").min(1, "Task ID is required"),
-    projectId: z.string().uuid("Invalid project ID").optional(),
-    title: z.string().min(1, "Title is required").max(255, "Title is too long").optional(),
+    id: z.uuid("Invalid task ID").min(1, "Task ID is required"),
+    projectId: z.uuid("Invalid project ID").optional(),
+    title: z
+        .string()
+        .min(1, "Title is required")
+        .max(255, "Title is too long")
+        .optional(),
     description: z.string().optional().nullable(),
     type: z
         .enum([
@@ -92,12 +106,27 @@ export const updateTask = z.object({
             TaskPriority.CRITICAL,
         ] as const)
         .optional(),
-    startDate: z.coerce.date().optional().nullable(),
-    dueDate: z.coerce.date().optional().nullable(),
-    assignedToId: z.string().optional().nullable(),
+    startDate: z.preprocess(
+        (arg) => (arg === "" || arg === undefined ? null : arg),
+        z.coerce.date().optional().nullable()
+    ),
+    dueDate: z.preprocess(
+        (arg) => (arg === "" || arg === undefined ? null : arg),
+        z.coerce.date().optional().nullable()
+    ),
+    assignedToId: z.preprocess(
+        (arg) => (arg === "UNASSIGNED" || arg === "" ? null : arg),
+        z.string().optional().nullable()
+    ),
 });
 
 export type UpdateTaskInput = z.infer<typeof updateTask>;
+
+export const deleteTask = z.object({
+    id: z.uuid("Invalid task ID").min(1, "Task ID is required"),
+});
+
+export type DeleteTaskInput = z.infer<typeof deleteTask>;
 
 export interface TaskFilters {
     status?: TaskStatus | "ALL";
@@ -118,15 +147,8 @@ export type TaskUser = {
     image?: string | null;
 };
 
-export type SubtaskItem = {
-    id: string;
-    title: string;
-    isCompleted: boolean;
-    order: number;
-    taskId: string;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
-};
+import type { SubtaskItem } from "../subtask/types";
+export type { SubtaskItem };
 
 export type TaskItem = {
     id: string;
@@ -149,6 +171,11 @@ export type TaskItem = {
         id: string;
         name: string;
         workspaceId: string;
+        ownerId?: string;
+        workspace?: {
+            id: string;
+            ownerId?: string;
+        };
     };
     subTasks?: SubtaskItem[];
     progress?: number;

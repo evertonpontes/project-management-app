@@ -123,6 +123,13 @@ export async function getTasks(
                         id: true,
                         name: true,
                         workspaceId: true,
+                        ownerId: true,
+                        workspace: {
+                            select: {
+                                id: true,
+                                ownerId: true,
+                            },
+                        },
                     },
                 },
                 subTasks: {

@@ -9,7 +9,7 @@ interface TaskStatusBadgeProps {
 
 const statusConfig: Record<string, { label: string; className: string }> = {
     [TaskStatus.TODO]: {
-        label: "Backlog",
+        label: "Todo",
         className: "bg-muted text-muted-foreground border-border",
     },
     [TaskStatus.IN_PROGRESS]: {

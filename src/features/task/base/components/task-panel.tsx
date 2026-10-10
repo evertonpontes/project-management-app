@@ -9,8 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
 import type { TaskFilters, TaskItem, TaskPaginationInput } from "../types";
 import { useGetTasks } from "../hooks";
+import { updateTaskAction } from "../actions";
 import { TaskCreateDrawer } from "./task-create-drawer";
 import { TaskDetailDrawer } from "./task-detail-drawer";
 import { TaskFiltersToolbar } from "./task-filters-toolbar";
@@ -41,12 +45,28 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
         rowSize: 50,
     });
 
+    const queryClient = useQueryClient();
     const { data, isLoading } = useGetTasks(projectId, filters, pagination);
     const tasks = data?.tasks || [];
 
     const handleOpenCreateDrawer = (status?: TaskStatus) => {
         setSelectedStatusForAdd(status);
         setIsCreateOpen(true);
+    };
+
+    const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
+        try {
+            const res = await updateTaskAction({ id: taskId, status: newStatus });
+            if (res?.serverError) {
+                toast.error(res.serverError.message || "Failed to update task status");
+            } else {
+                toast.success("Task status updated!");
+                queryClient.invalidateQueries({ queryKey: ["tasks"] });
+                queryClient.invalidateQueries({ queryKey: ["user-tasks"] });
+            }
+        } catch {
+            toast.error("Failed to update task status");
+        }
     };
 
     return (
@@ -115,6 +135,7 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
                             <TaskBoardView
                                 tasks={tasks}
                                 onAddTask={handleOpenCreateDrawer}
+                                onStatusChange={handleStatusChange}
                                 onTaskClick={setSelectedTaskForDetail}
                             />
                         </TabsContent>
@@ -146,15 +167,22 @@ export function TaskPanel({ projectId, projectName }: TaskPanelProps) {
             />
 
             {/* View / Edit Task Detail Drawer */}
-            <TaskDetailDrawer
-                task={selectedTaskForDetail}
-                open={Boolean(selectedTaskForDetail)}
-                onOpenChange={(open) => {
-                    if (!open) {
-                        setSelectedTaskForDetail(null);
-                    }
-                }}
-            />
+            {(() => {
+                const activeTask =
+                    tasks.find((t) => t.id === selectedTaskForDetail?.id) ??
+                    selectedTaskForDetail;
+                return (
+                    <TaskDetailDrawer
+                        task={activeTask}
+                        open={Boolean(selectedTaskForDetail)}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                setSelectedTaskForDetail(null);
+                            }
+                        }}
+                    />
+                );
+            })()}
         </div>
     );
 }

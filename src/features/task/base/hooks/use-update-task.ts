@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 
 import { updateTaskAction } from "../actions";
-import { updateTask, type UpdateTaskInput } from "../types";
+import { updateTask, type UpdateTaskInput, type TaskItem } from "../types";
 
 export function useUpdateTask(
     initialValues?: Partial<UpdateTaskInput>,
@@ -30,16 +30,31 @@ export function useUpdateTask(
             },
         },
         actionProps: {
-            onSuccess: () => {
+            onSuccess: ({ data }) => {
                 toast.success("Task updated successfully!");
                 queryClient.invalidateQueries({ queryKey: ["tasks"] });
                 queryClient.invalidateQueries({ queryKey: ["user-tasks"] });
-                if (initialValues?.projectId) {
+                if (data?.task) {
+                    queryClient.setQueriesData<{ tasks: TaskItem[]; pagination: unknown }>(
+                        { queryKey: ["tasks"] },
+                        (old) => {
+                            if (!old?.tasks) return old;
+                            return {
+                                ...old,
+                                tasks: old.tasks.map((t: TaskItem) =>
+                                    t.id === data.task.id ? { ...t, ...data.task } : t
+                                ),
+                            };
+                        }
+                    );
+                }
+                const targetProjectId = data?.task?.projectId || initialValues?.projectId;
+                if (targetProjectId) {
                     queryClient.invalidateQueries({
-                        queryKey: ["tasks", initialValues.projectId],
+                        queryKey: ["tasks", targetProjectId],
                     });
                     queryClient.invalidateQueries({
-                        queryKey: ["project", initialValues.projectId],
+                        queryKey: ["project", targetProjectId],
                     });
                 }
                 onSuccessCallback?.();
